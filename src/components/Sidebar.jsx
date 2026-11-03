@@ -1,20 +1,14 @@
 export default function Sidebar({
+  user,
   sidebarTools,
   stats,
-  scores,
-  formatScore,
   activeId,
   onOpen,
   onTogglePin,
   onReset,
   confirmReset,
-  explainTool,
-  buttonScale,
-  showWhy,
-  onToggleWhy,
-  enlargeButtons,
-  onToggleEnlarge,
   onShowAll,
+  onLogout,
 }) {
   return (
     <aside className="sidebar">
@@ -23,13 +17,23 @@ export default function Sidebar({
         <h1>Adaptacyjny panel</h1>
       </div>
 
+      <div className="user-box">
+        <div className="user-avatar" aria-hidden>
+          {user.username.slice(0, 1).toUpperCase()}
+        </div>
+        <div className="user-meta">
+          <strong>{user.username}</strong>
+          <button type="button" className="linkish dark" onClick={onLogout}>
+            Wyloguj
+          </button>
+        </div>
+      </div>
+
       <section className="nav-section">
         <h2>Najczęściej używane</h2>
         <div className="nav-list">
           {sidebarTools.map((tool) => {
             const s = stats[tool.id]
-            const score = scores[tool.id] || 0
-            const scale = enlargeButtons ? buttonScale(tool.id) : 1
             const isActive = activeId === tool.id
 
             return (
@@ -37,18 +41,14 @@ export default function Sidebar({
                 <button
                   type="button"
                   className={`nav-item${isActive ? ' active' : ''}`}
-                  style={{ transform: `scale(${scale})`, transformOrigin: 'left center' }}
                   onClick={() => onOpen(tool.id)}
-                  title={showWhy ? explainTool(tool.id) : tool.name}
+                  title={tool.name}
                 >
                   <span className="nav-icon" aria-hidden>
                     {tool.icon}
                   </span>
                   <span className="nav-text">
                     <span className="nav-name">{tool.name}</span>
-                    <span className="nav-uses">
-                      {s.uses} · waga {formatScore(score)}
-                    </span>
                   </span>
                 </button>
                 <button
@@ -71,14 +71,6 @@ export default function Sidebar({
       </button>
 
       <div className="sidebar-footer">
-        <label className="toggle-row">
-          <input type="checkbox" checked={showWhy} onChange={onToggleWhy} />
-          „Dlaczego tak?”
-        </label>
-        <label className="toggle-row">
-          <input type="checkbox" checked={enlargeButtons} onChange={onToggleEnlarge} />
-          Powiększaj popularne
-        </label>
         <button
           type="button"
           className={`btn reset-btn full${confirmReset ? ' confirm' : ''}`}

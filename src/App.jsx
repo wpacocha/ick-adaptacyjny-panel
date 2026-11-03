@@ -1,12 +1,28 @@
 import { useState } from 'react'
+import AuthScreen from './components/AuthScreen'
 import Sidebar from './components/Sidebar'
+import { UserProvider } from './context/UserContext'
 import { toolsById } from './data/tools'
+import { useAuth } from './hooks/useAuth'
 import { useToolStats } from './hooks/useToolStats'
 
 export default function App() {
+  const { currentUser, login, register, logout, isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) {
+    return <AuthScreen onLogin={login} onRegister={register} />
+  }
+
+  return (
+    <UserProvider user={currentUser}>
+      <Panel user={currentUser} onLogout={logout} />
+    </UserProvider>
+  )
+}
+
+function Panel({ user, onLogout }) {
   const {
     stats,
-    scores,
     activeId,
     setActiveId,
     openTool,
@@ -14,13 +30,8 @@ export default function App() {
     resetStats,
     sortedTools,
     sidebarTools,
-    explainTool,
-    buttonScale,
-    formatScore,
-  } = useToolStats()
+  } = useToolStats(user.id)
 
-  const [showWhy, setShowWhy] = useState(false)
-  const [enlargeButtons, setEnlargeButtons] = useState(true)
   const [confirmReset, setConfirmReset] = useState(false)
 
   const active = activeId ? toolsById[activeId] : null
@@ -40,22 +51,16 @@ export default function App() {
   return (
     <div className="app-shell">
       <Sidebar
+        user={user}
         sidebarTools={sidebarTools}
         stats={stats}
-        scores={scores}
-        formatScore={formatScore}
         activeId={activeId}
         onOpen={openTool}
         onTogglePin={togglePin}
         onReset={handleReset}
         confirmReset={confirmReset}
-        explainTool={explainTool}
-        buttonScale={buttonScale}
-        showWhy={showWhy}
-        onToggleWhy={() => setShowWhy((v) => !v)}
-        enlargeButtons={enlargeButtons}
-        onToggleEnlarge={() => setEnlargeButtons((v) => !v)}
         onShowAll={showAll}
+        onLogout={onLogout}
       />
 
       <main className="workspace">
@@ -72,12 +77,6 @@ export default function App() {
                 </div>
               </div>
               <div className="header-actions">
-                {showWhy && (
-                  <aside className="why-box">
-                    <strong>Dlaczego tu?</strong>
-                    <p>{explainTool(active.id)}</p>
-                  </aside>
-                )}
                 <button
                   type="button"
                   className={`btn reset-btn${confirmReset ? ' confirm' : ''}`}
@@ -110,13 +109,9 @@ export default function App() {
                   type="button"
                   className={`welcome-card${stats[tool.id]?.pinned ? ' pinned' : ''}`}
                   onClick={() => openTool(tool.id)}
-                  title={showWhy ? explainTool(tool.id) : undefined}
                 >
                   <span>{tool.icon}</span>
                   <strong>{tool.name}</strong>
-                  <em>
-                    {stats[tool.id].uses} · waga {formatScore(scores[tool.id] || 0)}
-                  </em>
                 </button>
               ))}
             </div>

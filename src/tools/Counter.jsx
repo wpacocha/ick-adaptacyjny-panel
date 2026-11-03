@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react'
+import { toolKeyForUser } from '../auth/storage'
+import { useCurrentUser } from '../context/UserContext'
 
-const KEY = 'ick-tool-counter'
+const BASE_KEY = 'ick-tool-counter'
 
 export default function Counter() {
-  const [count, setCount] = useState(() => Number(localStorage.getItem(KEY)) || 0)
+  const user = useCurrentUser()
+  const storageKey = toolKeyForUser(BASE_KEY, user.id)
+  const [count, setCount] = useState(() => Number(localStorage.getItem(storageKey)) || 0)
 
   useEffect(() => {
-    localStorage.setItem(KEY, String(count))
-  }, [count])
+    setCount(Number(localStorage.getItem(storageKey)) || 0)
+  }, [storageKey])
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, String(count))
+  }, [count, storageKey])
 
   return (
     <div className="tool">

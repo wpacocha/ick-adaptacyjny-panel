@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { statsKeyForUser } from '../auth/storage'
 import { RECENT_LIMIT, SIDEBAR_LIMIT, tools } from '../data/tools'
-
-const STORAGE_KEY = 'ick-adaptive-panel-stats-v2'
 
 /** Po tylu dniach pojedyncze użycie traci połowę wagi. */
 export const HALF_LIFE_DAYS = 7
@@ -24,7 +23,6 @@ function normalizeEntry(raw) {
     ? raw.history.map(Number).filter((t) => Number.isFinite(t) && t > 0)
     : []
 
-  // Migracja ze starego formatu (tylko licznik): przybliż historię ostatnim użyciem.
   if (history.length === 0 && uses > 0 && lastUsed > 0) {
     history = Array.from({ length: Math.min(uses, MAX_HISTORY) }, () => lastUsed)
   }
@@ -37,11 +35,10 @@ function normalizeEntry(raw) {
   }
 }
 
-function loadStats() {
+function loadStats(userId) {
+  if (!userId) return createDefaultStats()
   try {
-    const raw =
-      localStorage.getItem(STORAGE_KEY) ||
-      localStorage.getItem('ick-adaptive-panel-stats-v1')
+    const raw = localStorage.getItem(statsKeyForUser(userId))
     if (!raw) return createDefaultStats()
     const parsed = JSON.parse(raw)
     const base = createDefaultStats()
@@ -71,20 +68,26 @@ function formatScore(score) {
   return String(Math.round(score))
 }
 
-export function useToolStats() {
-  const [stats, setStats] = useState(loadStats)
+export function useToolStats(userId) {
+  const [stats, setStats] = useState(() => loadStats(userId))
   const [activeId, setActiveId] = useState(null)
   const [now, setNow] = useState(() => Date.now())
 
-  // Odświeżaj wagi okresowo, żeby ranking „starzał się” także bez nowych kliknięć.
+  // Przy zmianie użytkownika przeładuj jego panel.
+  useEffect(() => {
+    setStats(loadStats(userId))
+    setActiveId(null)
+  }, [userId])
+
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 60_000)
     return () => clearInterval(id)
   }, [])
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(stats))
-  }, [stats])
+    if (!userId) return
+    localStorage.setItem(statsKeyForUser(userId), JSON.stringify(stats))
+  }, [stats, userId])
 
   const scores = useMemo(() => {
     const map = {}
@@ -130,7 +133,6 @@ export function useToolStats() {
   const resetStats = useCallback(() => {
     setStats(createDefaultStats())
     setActiveId(null)
-    localStorage.removeItem('ick-adaptive-panel-stats-v1')
   }, [])
 
   const sortedTools = useMemo(() => {

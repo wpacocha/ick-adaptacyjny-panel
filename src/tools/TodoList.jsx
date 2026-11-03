@@ -1,20 +1,31 @@
 import { useEffect, useState } from 'react'
+import { toolKeyForUser } from '../auth/storage'
+import { useCurrentUser } from '../context/UserContext'
 
-const KEY = 'ick-tool-todos'
+const BASE_KEY = 'ick-tool-todos'
+
+function loadItems(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key)) || []
+  } catch {
+    return []
+  }
+}
 
 export default function TodoList() {
-  const [items, setItems] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem(KEY)) || []
-    } catch {
-      return []
-    }
-  })
+  const user = useCurrentUser()
+  const storageKey = toolKeyForUser(BASE_KEY, user.id)
+  const [items, setItems] = useState(() => loadItems(storageKey))
   const [text, setText] = useState('')
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(items))
-  }, [items])
+    setItems(loadItems(storageKey))
+    setText('')
+  }, [storageKey])
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(items))
+  }, [items, storageKey])
 
   const add = (e) => {
     e.preventDefault()

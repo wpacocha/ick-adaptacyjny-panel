@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react'
+import { toolKeyForUser } from '../auth/storage'
+import { useCurrentUser } from '../context/UserContext'
 
-const KEY = 'ick-tool-notes'
+const BASE_KEY = 'ick-tool-notes'
 
 export default function Notes() {
-  const [text, setText] = useState(() => localStorage.getItem(KEY) || '')
+  const user = useCurrentUser()
+  const storageKey = toolKeyForUser(BASE_KEY, user.id)
+  const [text, setText] = useState(() => localStorage.getItem(storageKey) || '')
 
   useEffect(() => {
-    localStorage.setItem(KEY, text)
-  }, [text])
+    setText(localStorage.getItem(storageKey) || '')
+  }, [storageKey])
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, text)
+  }, [text, storageKey])
 
   return (
     <div className="tool">
-      <p className="tool-lead">Notatki zapisują się automatycznie w przeglądarce.</p>
       <textarea
         className="notes-area"
         value={text}
