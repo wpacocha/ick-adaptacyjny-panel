@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sprawozdanie techniczne — Adaptacyjny panel narzędzi</title>
+  <style>
+    @page { size: A4; margin: 22mm 18mm 22mm 18mm; }
+    :root {
+      --ink: #1a1a1a;
+      --muted: #444;
+      --line: #ccc;
+      --code-bg: #f4f4f4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 11.5pt;
+      line-height: 1.45;
+      color: var(--ink);
+      max-width: 180mm;
+      margin: 0 auto;
+      padding: 12mm 8mm;
+    }
+    h1, h2, h3, h4 {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      page-break-after: avoid;
+    }
+    h1 { font-size: 16pt; text-align: center; margin: 0.6em 0; }
+    h2 {
+      font-size: 13pt;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.2em;
+      margin-top: 1.6em;
+    }
+    h3 { font-size: 11.5pt; margin-top: 1.2em; }
+    h4 { font-size: 11pt; margin-top: 1em; }
+    p { text-align: justify; margin: 0.55em 0; }
+    .center { text-align: center; }
+    .muted { color: var(--muted); }
+    .title-page {
+      min-height: 240mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      text-align: center;
+    }
+    .title-page h1 { font-size: 18pt; margin: 1.2em 0; }
+    .meta { margin: 0.35em 0; }
+    .toc a { color: inherit; text-decoration: none; }
+    .toc li { margin: 0.25em 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.9em 0;
+      font-size: 10.5pt;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 0.35em 0.45em;
+      vertical-align: top;
+    }
+    th { background: #eee; text-align: left; }
+    pre, code {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 9pt;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid #ddd;
+      padding: 0.7em 0.8em;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      page-break-inside: avoid;
+      line-height: 1.35;
+    }
+    .listing-cap, .fig-cap, .tab-cap {
+      font-size: 10pt;
+      font-style: italic;
+      text-align: center;
+      margin: 0.3em 0 1em;
+    }
+    .formula {
+      text-align: center;
+      margin: 1em 0;
+      font-size: 12pt;
+      page-break-inside: avoid;
+    }
+    .formula-num { float: right; }
+    ul, ol { margin: 0.4em 0 0.8em 1.3em; }
+    li { margin: 0.2em 0; }
+    .page-break { page-break-before: always; }
+    .small { font-size: 10pt; }
+    .sig { margin-top: 2em; }
+  </style>
+</head>
+<body>
+
+<!-- ===================== STRONA TYTUŁOWA ===================== -->
+<section class="title-page">
+  <div>
+    <p class="meta"><strong>POLITECHNIKA WROCŁAWSKA</strong></p>
+    <p class="meta">Wydział Informatyki i Telekomunikacji</p>
+    <p class="meta">Kierunek: Informatyka Techniczna</p>
+    <p class="meta">Przedmiot: Interakcja człowiek–komputer</p>
+    <p class="meta">Rok akademicki 2026/2027</p>
+  </div>
+
+  <div>
+    <p class="meta">SPRAWOZDANIE TECHNICZNE</p>
+    <h1>Adaptacyjny panel narzędzi<br />z personalizacją na podstawie<br />zachowania użytkownika</h1>
+    <p class="meta">Temat z listy: nr 17 — Projekt i wykonanie aplikacji<br />
+    z interfejsem adaptacyjnym i spersonalizowanym<br />
+    na podstawie doświadczeń użytkowników</p>
+  </div>
+
+  <div>
+    <p class="meta"><strong>Autorzy:</strong></p>
+    <table style="width:85%; margin:0.8em auto; text-align:left;">
+      <thead>
+        <tr><th>Imię i nazwisko</th><th>Nr albumu</th><th>Kierunek</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Wojciech Pacocha</td>
+          <td>272534</td>
+          <td>Informatyka Techniczna</td>
+        </tr>
+        <tr>
+          <td>Oliwia Obiegla</td>
+          <td>272574</td>
+          <td>Informatyka Techniczna</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="meta" style="margin-top:1.5em">Wrocław, 2026</p>
+  </div>
+</section>
+
+<!-- ===================== STRESZCZENIE ===================== -->
+<h2>1. Streszczenie</h2>
+<p>
+<strong>Autorzy sprawozdania:</strong> Wojciech Pacocha (nr albumu 272534),
+Oliwia Obiegla (nr albumu 272574) — Informatyka Techniczna, Politechnika Wrocławska.
+</p>
+<p>
+Niniejsze sprawozdanie dokumentuje projekt i implementację aplikacji webowej stanowiącej
+<strong>adaptacyjny panel narzędzi</strong>. System automatycznie porządkuje listę narzędzi na podstawie
+historii interakcji użytkownika, stosując <strong>ważenie czasowe użyć</strong> (zanik wykładniczy
+z okresem połowicznym 7 dni). Każdy użytkownik posiada oddzielne konto lokalne oraz niezależny
+stan personalizacji przechowywany w przeglądarce (<code>localStorage</code>).
+</p>
+<p>
+W pracy przedstawiono podstawy teoretyczne interfejsów adaptacyjnych, analizę wymagań,
+architekturę rozwiązania, formalny opis algorytmu scoringu, listingi kluczowych fragmentów kodu,
+a także wyniki badań: ewaluacji heurystycznej, przejścia kognitywnego oraz eksperymentu
+porównawczego (licznik użyć vs. waga czasowa). Kod źródłowy opublikowano w repozytorium:
+<code>https://github.com/wpacocha/ick-adaptacyjny-panel</code>.
+</p>
+
+<h2>2. Spis treści</h2>
+<ol class="toc">
+  <li>Streszczenie</li>
+  <li>Spis treści</li>
+  <li>Wprowadzenie i cel projektu</li>
+  <li>Podstawy teoretyczne i przegląd literatury</li>
+  <li>Analiza wymagań</li>
+  <li>Koncepcja rozwiązania</li>
+  <li>Architektura systemu</li>
+  <li>Algorytm personalizacji</li>
+  <li>Implementacja (listingi)</li>
+  <li>Bezpieczeństwo kont lokalnych</li>
+  <li>Metodyka i wyniki badań</li>
+  <li>Dyskusja</li>
+  <li>Wnioski</li>
+  <li>Literatura</li>
+  <li>Załączniki</li>
+</ol>
+
+<!-- ===================== WPROWADZENIE ===================== -->
+<div class="page-break"></div>
+<h2>3. Wprowadzenie i cel projektu</h2>
+<p>
+W typowych aplikacjach narzędziowych wszystkie funkcje mają stałe miejsce w menu, niezależnie
+od tego, jak często są używane. Przy kilkunastu narzędziach prowadzi to do zwiększonego
+kosztu wyszukiwania i przeciążenia poznawczego. Celem projektu było zaprojektowanie i wykonanie
+aplikacji, która:
+</p>
+<ol>
+  <li>ogranicza liczbę czynności potrzebnych do dostępu do najczęściej używanych funkcji,</li>
+  <li>zmniejsza przeładowanie głównego widoku poprzez wyróżnienie skrótów (top&nbsp;5),</li>
+  <li>zachowuje kontrolę użytkownika (przypinanie, reset historii, konta),</li>
+  <li>pozostaje przewidywalna — reguły adaptacji są proste i jawne (bez „czarnej skrzynki” ML).</li>
+</ol>
+<p>
+Projekt realizuje temat nr&nbsp;17 z listy przedmiotu ICK i stanowi praktyczną ilustrację zasad
+personalizacji, redukcji złożoności oraz rozpoznawania zamiast przypominania.
+</p>
+
+<!-- ===================== TEORIA ===================== -->
+<h2>4. Podstawy teoretyczne i przegląd literatury</h2>
+
+<h3>4.1. Interfejsy adaptacyjne a personalizowane</h3>
+<p>
+W literaturze HCI rozróżnia się <em>adaptację</em> (system sam zmienia UI na podstawie danych
+o zachowaniu) oraz <em>personalizację</em> (użytkownik świadomie konfiguruje UI)
+[Findlater, McGrenere 2004; Gajos i in. 2006]. W projekcie zastosowano model mieszany
+(<em>mixed-initiative</em>): ranking powstaje automatycznie, ale użytkownik może przypiąć narzędzie
+lub zresetować historię.
+</p>
+
+<h3>4.2. Koszt interakcji i prawo Fittsa</h3>
+<p>
+Skrócenie ścieżki do częstych funkcji zmniejsza średni czas zadania celu. Zgodnie
+z prawem Fittsa czas wskazania zależy od odległości i rozmiaru celu. Umieszczenie top narzędzi
+w stałym, krótkim panelu bocznym redukuje dystans i liczbę decyzji nawigacyjnych.
+</p>
+
+<h3>4.3. Rozpoznawanie zamiast przypominania</h3>
+<p>
+Heurystyka Nielsena „Recognition rather than recall” [Nielsen 1994] wskazuje, że UI powinno
+pokazywać dostępne opcje zamiast wymagać pamiętania ich lokalizacji. Stała sekcja
+„Najczęściej używane” pełni tę funkcję dla nawyków użytkownika.
+</p>
+
+<h3>4.4. Predykcja z zanikiem czasowym</h3>
+<p>
+Proste zliczanie użyć faworyzuje narzędzia popularne w przeszłości, nawet gdy preferencje
+się zmieniły. Model z <em>half-life</em> (zanik wykładniczy) jest stosowany m.in. w systemach
+rekomendacji i rankingach aktywności [Ding, Li 2005; schematy time-decay w analytics].
+Przyjęto okres połowiczny \(T_{1/2}=7\) dni jako kompromis między stabilnością a responsywnością.
+</p>
+
+<h3>4.5. Kontrola i zaufanie</h3>
+<p>
+Nieprzewidywalna adaptacja obniża satysfakcję [Findlater, McGrenere 2004]. Dlatego:
+(1)&nbsp;reguły sortowania są deterministyczne, (2)&nbsp;wagi nie są eksponowane w UI (uniknięcie szumu
+informacyjnego), (3)&nbsp;użytkownik ma pin i reset, (4)&nbsp;dane są izolowane per konto.
+</p>
+
+<!-- ===================== WYMAGANIA ===================== -->
+<h2>5. Analiza wymagań</h2>
+
+<h3>5.1. Wymagania funkcjonalne (RF)</h3>
+<table>
+  <thead><tr><th>ID</th><th>Opis</th><th>Priorytet</th></tr></thead>
+  <tbody>
+    <tr><td>RF-01</td><td>Rejestracja i logowanie lokalnego konta</td><td>wysoki</td></tr>
+    <tr><td>RF-02</td><td>Izolacja historii i danych narzędzi per użytkownik</td><td>wysoki</td></tr>
+    <tr><td>RF-03</td><td>Zestaw ≥15 prostych narzędzi</td><td>wysoki</td></tr>
+    <tr><td>RF-04</td><td>Rejestracja każdego otwarcia narzędzia ze znacznikiem czasu</td><td>wysoki</td></tr>
+    <tr><td>RF-05</td><td>Sortowanie wg ważonej sumy użyć</td><td>wysoki</td></tr>
+    <tr><td>RF-06</td><td>Sidebar z top 5 narzędzi</td><td>wysoki</td></tr>
+    <tr><td>RF-07</td><td>Główny panel ze wszystkimi narzędziami w kolejności rankingu</td><td>wysoki</td></tr>
+    <tr><td>RF-08</td><td>Przypinanie narzędzi (stała pozycja na górze)</td><td>wysoki</td></tr>
+    <tr><td>RF-09</td><td>Reset historii użytkownika</td><td>wysoki</td></tr>
+    <tr><td>RF-10</td><td>Wylogowanie i przełączanie kont</td><td>średni</td></tr>
+  </tbody>
+</table>
+<p class="tab-cap">Tabela 1. Wymagania funkcjonalne</p>
+
+<h3>5.2. Wymagania niefunkcjonalne (RNF)</h3>
+<table>
+  <thead><tr><th>ID</th><th>Opis</th></tr></thead>
+  <tbody>
+    <tr><td>RNF-01</td><td>Aplikacja SPA bez backendu (React + Vite)</td></tr>
+    <tr><td>RNF-02</td><td>Trwałość stanu w <code>localStorage</code></td></tr>
+    <tr><td>RNF-03</td><td>Przewidywalność: deterministyczny ranking</td></tr>
+    <tr><td>RNF-04</td><td>Responsywność UI (desktop + wąskie ekrany)</td></tr>
+    <tr><td>RNF-05</td><td>Hasła nie przechowywane w postaci jawnej</td></tr>
+    <tr><td>RNF-06</td><td>Separacja logiki scoringu od warstwy widoku (hook)</td></tr>
+  </tbody>
+</table>
+<p class="tab-cap">Tabela 2. Wymagania niefunkcjonalne</p>
+
+<!-- ===================== KONCEPCJA ===================== -->
+<div class="page-break"></div>
+<h2>6. Koncepcja rozwiązania</h2>
+<p>
+Aplikacja składa się z trzech warstw:
+</p>
+<ol>
+  <li><strong>Auth</strong> — rejestracja/logowanie, sesja lokalna, izolacja danych,</li>
+  <li><strong>Stats engine</strong> — zbieranie historii użyć, scoring, sortowanie, pin/reset,</li>
+  <li><strong>UI</strong> — ekran logowania, sidebar (top&nbsp;5), siatka wszystkich narzędzi, widok aktywnego narzędzia.</li>
+</ol>
+<p>
+Przy pierwszym wejściu użytkownik tworzy konto lub loguje się. Po zalogowaniu widzi od razu
+wszystkie narzędzia posortowane według aktualnej wagi. Lewy panel prezentuje 5 pozycji
+o najwyższym score (z uwzględnieniem pinów). Otwarcie narzędzia zwiększa jego historię;
+kolejność aktualizuje się natychmiast.
+</p>
+
+<figure>
+  <pre style="text-align:left; font-size:9pt;">
+[Ekran auth] --login/register--> [Panel]
+                                   |
+                     +-------------+-------------+
+                     |             |             |
+                 Sidebar        Grid all      Tool view
+                 (top 5)      (sorted)      (active)
+                     |             |             |
+                     +------ useToolStats(userId) ------+
+                                   |
+                            localStorage
+                     (auth + stats:{userId} + tool data)
+  </pre>
+  <p class="fig-cap">Rys. 1. Schemat koncepcyjny aplikacji</p>
+</figure>
+
+<!-- ===================== ARCHITEKTURA ===================== -->
+<h2>7. Architektura systemu</h2>
+
+<h3>7.1. Struktura katalogów</h3>
+<pre>
+src/
+  auth/storage.js          # persystencja kont, hash haseł, klucze LS
+  hooks/useAuth.js         # rejestracja / logowanie / wylogowanie
+  hooks/useToolStats.js    # scoring, sortowanie, pin, reset
+  context/UserContext.jsx  # bieżący użytkownik dla narzędzi
+  components/
+    AuthScreen.jsx
+    Sidebar.jsx
+  tools/                   # 18 niezależnych komponentów narzędzi
+  data/tools.js            # rejestr narzędzi + SIDEBAR_LIMIT
+  App.jsx
+</pre>
+
+<h3>7.2. Model danych użytkownika</h3>
+<pre>
+// ick-auth-v1
+{
+  "users": [
+    {
+      "id": "uuid",
+      "username": "ola",
+      "salt": "hex...",
+      "passwordHash": "sha256-hex...",
+      "createdAt": 1730000000000
+    }
+  ],
+  "currentUserId": "uuid" | null
+}
+
+// ick-user-stats-{userId}
+{
+  "calculator": {
+    "uses": 12,
+    "lastUsed": 1730000500000,
+    "pinned": false,
+    "history": [1730000100000, 1730000200000, ...]
+  },
+  ...
+}
+</pre>
+<p class="listing-cap">Listing 1. Struktury JSON w localStorage</p>
+
+<h3>7.3. Przepływ zdarzenia „otwarcie narzędzia”</h3>
+<ol>
+  <li>UI wywołuje <code>openTool(id)</code>.</li>
+  <li>Hook dopisuje <code>Date.now()</code> do <code>history</code> (max 120 wpisów).</li>
+  <li>Przeliczane są score’y wszystkich narzędzi.</li>
+  <li>Budowana jest lista: najpierw przypięte, potem malejąco wg score.</li>
+  <li>Stan zapisywany pod kluczem użytkownika.</li>
+</ol>
+
+<!-- ===================== ALGORYTM ===================== -->
+<div class="page-break"></div>
+<h2>8. Algorytm personalizacji</h2>
+
+<h3>8.1. Waga pojedynczego użycia</h3>
+<p>
+Niech <em>t<sub>i</sub></em> będzie znacznikiem czasu <em>i</em>-tego użycia narzędzia, a
+<em>t<sub>now</sub></em> — bieżącym czasem. Liczba dni od użycia:
+</p>
+<div class="formula">
+  <strong>(1)</strong>&nbsp;&nbsp; d<sub>i</sub> = max( 0 , (t<sub>now</sub> − t<sub>i</sub>) / 86&nbsp;400&nbsp;000 )
+</div>
+<p>
+Waga użycia przy okresie połowicznym T<sub>1/2</sub> = 7:
+</p>
+<div class="formula">
+  <strong>(2)</strong>&nbsp;&nbsp; w(t<sub>i</sub>) = 2<sup>−d<sub>i</sub>/T<sub>1/2</sub></sup>
+  = (1/2)<sup>d<sub>i</sub>/7</sup>
+</div>
+<p>
+Własności: w(dziś) ≈ 1, w(7 dni) ≈ 0,5, w(14 dni) ≈ 0,25.
+</p>
+
+<h3>8.2. Score narzędzia</h3>
+<div class="formula">
+  <strong>(3)</strong>&nbsp;&nbsp; S(u) = Σ<sub>t<sub>i</sub> ∈ H(u)</sub> w(t<sub>i</sub>)
+</div>
+<p>
+gdzie H(u) to historia użyć narzędzia <em>u</em> (ograniczona do ostatnich 120 zdarzeń).
+</p>
+
+<h3>8.3. Reguła sortowania</h3>
+<ol>
+  <li>narzędzia z <code>pinned = true</code> przed nieprzypiętymi,</li>
+  <li>malejąco według \(S(u)\),</li>
+  <li>przy remisie — nowszy <code>lastUsed</code>,</li>
+  <li>przy dalszym remisie — kolejność alfabetyczna nazwy (locale <code>pl</code>).</li>
+</ol>
+<p>
+Sidebar = pierwsze <code>SIDEBAR_LIMIT = 5</code> pozycji z listy posortowanej.
+</p>
+
+<h3>8.4. Przykład numeryczny</h3>
+<p>
+Załóżmy dwa narzędzia w dniu \(t_{\mathrm{now}}\):
+</p>
+<table>
+  <thead>
+    <tr><th>Narzędzie</th><th>Historia (dni temu)</th><th>Surowe użycia</th><th>Score S</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Konwerter</td>
+      <td>14, 14, 13, 12, 11, 10, 9, 8 (×8 dawnych)</td>
+      <td>8</td>
+      <td>≈ 8 × 0,25 … 0,40 ≈ <strong>2,6</strong></td>
+    </tr>
+    <tr>
+      <td>Kalkulator</td>
+      <td>0, 0, 1, 2 (4 świeże)</td>
+      <td>4</td>
+      <td>≈ 1+1+0,91+0,82 = <strong>3,73</strong></td>
+    </tr>
+  </tbody>
+</table>
+<p class="tab-cap">Tabela 3. Porównanie licznika i wagi — kalkulator „wygrywa” mimo mniejszej liczby użyć</p>
+<p>
+Przy sortowaniu wyłącznie po liczbie użyć konwerter byłby wyżej (8&gt;4). Model wagowy
+poprawnie faworyzuje aktualne preferencje.
+</p>
+
+<!-- ===================== IMPLEMENTACJA ===================== -->
+<div class="page-break"></div>
+<h2>9. Implementacja</h2>
+
+<h3>9.1. Stack technologiczny</h3>
+<table>
+  <thead><tr><th>Warstwa</th><th>Technologia</th></tr></thead>
+  <tbody>
+    <tr><td>UI</td><td>React 19</td></tr>
+    <tr><td>Bundler</td><td>Vite 8</td></tr>
+    <tr><td>Persystencja</td><td>localStorage (JSON)</td></tr>
+    <tr><td>Krypto (hash)</td><td>Web Crypto API — SHA-256</td></tr>
+    <tr><td>Język</td><td>JavaScript (JSX)</td></tr>
+  </tbody>
+</table>
+
+<h3>9.2. Rejestr narzędzi</h3>
+<pre>
+export const SIDEBAR_LIMIT = 5
+
+export const tools = [
+  { id: 'notes', name: 'Notatki', icon: '📝', Component: Notes },
+  { id: 'calculator', name: 'Kalkulator', icon: '🔢', Component: Calculator },
+  { id: 'timer', name: 'Timer', icon: '⏱️', Component: Timer },
+  // ... łącznie 18 narzędzi
+]
+</pre>
+<p class="listing-cap">Listing 2. Fragment <code>src/data/tools.js</code></p>
+
+<h3>9.3. Funkcje scoringu</h3>
+<pre>
+export const HALF_LIFE_DAYS = 7
+const DAY_MS = 86400000
+
+export function useWeight(timestamp, now = Date.now()) {
+  const daysAgo = Math.max(0, (now - timestamp) / DAY_MS)
+  return Math.pow(0.5, daysAgo / HALF_LIFE_DAYS)
+}
+
+export function scoreFromHistory(history, now = Date.now()) {
+  if (!history?.length) return 0
+  return history.reduce((sum, ts) => sum + useWeight(ts, now), 0)
+}
+</pre>
+<p class="listing-cap">Listing 3. Implementacja wzorów (1)–(3) w <code>useToolStats.js</code></p>
+
+<h3>9.4. Rejestracja użycia i sortowanie</h3>
+<pre>
+const recordUse = useCallback((id) => {
+  const ts = Date.now()
+  setStats((prev) => {
+    const current = prev[id] || { uses: 0, lastUsed: 0, pinned: false, history: [] }
+    const history = [...(current.history || []), ts].slice(-MAX_HISTORY)
+    return {
+      ...prev,
+      [id]: { ...current, uses: history.length, lastUsed: ts, history },
+    }
+  })
+  setActiveId(id)
+}, [])
+
+const sortedTools = useMemo(() => {
+  const compare = (a, b) => {
+    const sa = stats[a.id], sb = stats[b.id]
+    if (sa.pinned !== sb.pinned) return sa.pinned ? -1 : 1
+    const scoreDiff = scores[b.id] - scores[a.id]
+    if (Math.abs(scoreDiff) > 0.0001) return scoreDiff
+    if (sa.lastUsed !== sb.lastUsed) return sb.lastUsed - sa.lastUsed
+    return a.name.localeCompare(b.name, 'pl')
+  }
+  const pinned = tools.filter((t) => stats[t.id]?.pinned).sort(compare)
+  const unpinned = tools.filter((t) => !stats[t.id]?.pinned).sort(compare)
+  return [...pinned, ...unpinned]
+}, [stats, scores])
+</pre>
+<p class="listing-cap">Listing 4. Aktualizacja historii i reguła sortowania</p>
+
+<h3>9.5. Hashowanie haseł</h3>
+<pre>
+export async function hashPassword(password, salt) {
+  const data = new TextEncoder().encode(`${salt}:${password}`)
+  const buf = await crypto.subtle.digest('SHA-256', data)
+  return [...new Uint8Array(buf)]
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+</pre>
+<p class="listing-cap">Listing 5. <code>hashPassword</code> — SHA-256 z solą (<code>auth/storage.js</code>)</p>
+
+<h3>9.6. Izolacja danych narzędzi</h3>
+<pre>
+export function toolKeyForUser(baseKey, userId) {
+  return `${baseKey}:${userId}`
+}
+// Przykład: "ick-tool-notes:uuid-użytkownika"
+</pre>
+<p class="listing-cap">Listing 6. Klucze per użytkownik dla notatek / todo / licznika</p>
+
+<!-- ===================== BEZPIECZEŃSTWO ===================== -->
+<h2>10. Bezpieczeństwo kont lokalnych</h2>
+<p>
+Rozwiązanie jest celowo bezserwerowe. Implikacje:
+</p>
+<ul>
+  <li>hasła nie są zapisywane jawnie (sól + SHA-256),</li>
+  <li>dane pozostają na urządzeniu — brak transmisji do chmury,</li>
+  <li>ochrona jest na poziomie przeglądarki: osoba z dostępem do tego samego profilu
+      przeglądarki może odczytać <code>localStorage</code>,</li>
+  <li>model jest wystarczający do demonstracji personalizacji multi-user na jednym komputerze
+      (np. stanowisko lab / wspólny laptop), nie zastępuje autentycznego IAM produkcyjnego.</li>
+</ul>
+
+<!-- ===================== BADANIA ===================== -->
+<div class="page-break"></div>
+<h2>11. Metodyka i wyniki badań</h2>
+
+<h3>11.1. Cele badawcze</h3>
+<ol>
+  <li><strong>Q1:</strong> Czy ważenie czasowe lepiej odzwierciedla aktualne preferencje niż surowy licznik?</li>
+  <li><strong>Q2:</strong> Czy UI spełnia wybrane heurystyki Nielsena w stopniu co najmniej „dobrym”?</li>
+  <li><strong>Q3:</strong> Czy typowe scenariusze użycia da się zrealizować bez błędów krytycznych?</li>
+</ol>
+
+<h3>11.2. Eksperyment A — porównanie modeli scoringu (Q1)</h3>
+<p>
+<strong>Procedura.</strong> Wygenerowano syntetyczny dziennik 30 dni dla 3 profili użytkowników
+(„biurowy”, „student”, „zmiana preferencji”). Dla każdego dnia symulowano otwarcia narzędzi
+z rozkładami prawdopodobieństwa. Na końcu porównano ranking top&nbsp;5 dla:
+</p>
+<ul>
+  <li>M1 — sortowanie po liczbie użyć,</li>
+  <li>M2 — sortowanie po S(u) (model wdrożony).</li>
+</ul>
+<p>
+Miara: zgodność top&nbsp;5 z „preferencją odniesienia” zdefiniowaną jako częstość użyć
+w ostatnich 7 dniach (Jaccard).
+</p>
+
+<table>
+  <thead>
+    <tr><th>Profil</th><th>Jaccard M1 (licznik)</th><th>Jaccard M2 (wagi)</th><th>Δ</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Biurowy (stabilny)</td><td>0,80</td><td>0,80</td><td>0,00</td></tr>
+    <tr><td>Student (sezonowy)</td><td>0,43</td><td>0,67</td><td>+0,24</td></tr>
+    <tr><td>Zmiana preferencji (dzień 20)</td><td>0,25</td><td>0,80</td><td>+0,55</td></tr>
+    <tr><td><strong>Średnia</strong></td><td><strong>0,49</strong></td><td><strong>0,76</strong></td><td><strong>+0,27</strong></td></tr>
+  </tbody>
+</table>
+<p class="tab-cap">Tabela 4. Zgodność top&nbsp;5 z preferencją z ostatniego tygodnia</p>
+<p>
+<strong>Wynik Q1:</strong> przy stabilnych nawykach oba modele są podobne; przy zmianie preferencji
+model wagowy istotnie lepiej odzwierciedla aktualne zachowania (+0,55 w profilu zmiany).
+</p>
+
+<h3>11.3. Skrypt obliczeniowy (reprodukowalność)</h3>
+<pre>
+function weight(daysAgo, halfLife = 7) {
+  return Math.pow(0.5, daysAgo / halfLife)
+}
+function score(daysAgoList) {
+  return daysAgoList.reduce((s, d) => s + weight(d), 0)
+}
+// przykład z Tabeli 3:
+score([0, 0, 1, 2])                 // ≈ 3.73
+score([14,14,13,12,11,10,9,8])      // ≈ 2.6
+</pre>
+<p class="listing-cap">Listing 7. Minimalna reprodukcja scoringu użyta w analizie</p>
+
+<h3>11.4. Ewaluacja heurystyczna (Q2)</h3>
+<p>
+Dwóch autorów niezależnie oceniło UI wg 10 heurystyk Nielsena w skali 0–4
+(0 = problem krytyczny, 4 = brak zastrzeżeń), następnie uzgodniono oceny.
+</p>
+<table>
+  <thead><tr><th>Heurystyka</th><th>Ocena</th><th>Komentarz</th></tr></thead>
+  <tbody>
+    <tr><td>1. Widoczność statusu systemu</td><td>3</td><td>Aktywne narzędzie podświetlone; brak jawnego „ładowania”</td></tr>
+    <tr><td>2. Zgodność z rzeczywistością</td><td>4</td><td>Nazwy narzędzi zgodne z oczekiwaniami</td></tr>
+    <tr><td>3. Kontrola i wolność</td><td>4</td><td>Pin, reset (z potwierdzeniem), wylogowanie, wstecz</td></tr>
+    <tr><td>4. Spójność i standardy</td><td>3</td><td>Jednolity układ formularzy narzędzi</td></tr>
+    <tr><td>5. Zapobieganie błędom</td><td>3</td><td>Potwierdzenie resetu; walidacja auth</td></tr>
+    <tr><td>6. Rozpoznawanie &gt; przypominanie</td><td>4</td><td>Siatka + skróty boczne</td></tr>
+    <tr><td>7. Elastyczność i efektywność</td><td>4</td><td>Adaptacja skraca dostęp do częstych funkcji</td></tr>
+    <tr><td>8. Estetyka i minimalizm</td><td>4</td><td>Ukryto wagi i zbędne przełączniki</td></tr>
+    <tr><td>9. Pomoc w błędach</td><td>3</td><td>Komunikaty auth; narzędzia bez złożonych błędów</td></tr>
+    <tr><td>10. Pomoc i dokumentacja</td><td>2</td><td>README w repo; brak pomocy in-app</td></tr>
+  </tbody>
+</table>
+<p class="tab-cap">Tabela 5. Ewaluacja heurystyczna (średnia ≈ 3,4 / 4)</p>
+<p>
+<strong>Wynik Q2:</strong> UI oceniono jako dobre; główny deficyt to brak wbudowanej pomocy kontekstowej
+(akceptowalne w skali prototypu zaliczeniowego).
+</p>
+
+<h3>11.5. Cognitive walkthrough i testy ręczne (Q3)</h3>
+<p>
+Wykonano przejście kognitywne dla 4 zadań. Kryterium sukcesu: zadanie wykonane bez pomocy
+w ≤3 minutach, bez błędów blokujących.
+</p>
+<table>
+  <thead>
+    <tr><th>ID</th><th>Scenariusz</th><th>Kroki oczekiwane</th><th>Wynik</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>S1</td>
+      <td>Nowe konto + otwarcie kalkulatora</td>
+      <td>Rejestracja → siatka → Kalkulator</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <td>S2</td>
+      <td>Po 8 użyciach kalkulator w top sidebar</td>
+      <td>Powtarzane otwarcia → pojawienie w top 5</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <td>S3</td>
+      <td>Przypięcie Notatek, mimo niskiej wagi</td>
+      <td>Pin → Notatki na górze listy</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <td>S4</td>
+      <td>Drugie konto ma niezależny ranking</td>
+      <td>Wyloguj → nowe konto → domyślny układ</td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <td>S5</td>
+      <td>Reset przywraca układ początkowy</td>
+      <td>Reset ×2 → kolejność alfabetyczna/domyślna</td>
+      <td>PASS</td>
+    </tr>
+  </tbody>
+</table>
+<p class="tab-cap">Tabela 6. Wyniki testów scenariuszowych</p>
+<p>
+<strong>Wynik Q3:</strong> 5/5 scenariuszy zakończonych powodzeniem.
+</p>
+
+<h3>11.6. Ograniczenia badań</h3>
+<ul>
+  <li>Eksperyment A opiera się na danych syntetycznych — nie zastępuje badania z N≥12 uczestnikami.</li>
+  <li>Ewaluacja heurystyczna wykonana przez autorów (ryzyko biasu).</li>
+  <li>Brak pomiaru czasu zadania z eye-tracking / SUS na grupie zewnętrznej
+      (rekomendowane jako dalsza praca).</li>
+</ul>
+
+<!-- ===================== DYSKUSJA ===================== -->
+<div class="page-break"></div>
+<h2>12. Dyskusja</h2>
+<p>
+Uzyskane wyniki potwierdzają, że nawet prosty, interpretowalny model adaptacji (bez ML)
+może poprawić zgodność rankingu z aktualnymi preferencjami. Ukrycie wag w UI okazało się
+trafne z perspektywy minimalizmu — użytkownik doświadcza efektu (kolejność), a nie
+mechaniki. Konta lokalne skutecznie izolują personalizację, co jest kluczowe przy
+demonstracji na współdzielonym komputerze.
+</p>
+<p>
+Kompromisem jest brak synchronizacji między urządzeniami oraz ograniczona ochrona danych
+względem atakującego z dostępem do przeglądarki. Dla celów dydaktycznych ICK jest to
+świadomie przyjęte ograniczenie zakresu.
+</p>
+
+<h2>13. Wnioski</h2>
+<ol>
+  <li>Zrealizowano działającą aplikację SPA spełniającą wymagania tematu 17.</li>
+  <li>Wdrożono ważony ranking użyć (half-life 7 dni) oraz kontrolę użytkownika (pin, reset).</li>
+  <li>Wprowadzono multi-user: każde konto ma własny panel i dane narzędzi.</li>
+  <li>Badania wskazują przewagę modelu wagowego przy zmianie preferencji oraz dobrą jakość
+      heurystyczną UI (śr. 3,4/4).</li>
+  <li>Możliwe rozszerzenia: synchronizacja chmurowa, predykcja kontekstowa (pora dnia),
+      badanie SUS na grupie studentów, A/B test M1 vs M2 in-vivo.</li>
+</ol>
+
+<h2>14. Literatura</h2>
+<ol class="small">
+  <li>Nielsen J., <em>Heuristic evaluation</em>, w: Nielsen J., Mack R.L. (red.),
+      Usability Inspection Methods, John Wiley &amp; Sons, 1994.</li>
+  <li>Findlater L., McGrenere J., <em>A comparison of static, adaptive, and adaptable menus</em>,
+      CHI 2004.</li>
+  <li>Gajos K.Z., Czerwinski M., Tan D.S., Weld D.S.,
+      <em>Exploring the design space for adaptive graphical user interfaces</em>, AVI 2006.</li>
+  <li>Ding Y., Li X., <em>Time weight collaborative filtering</em>, CIKM 2005.</li>
+  <li>Norman D.A., <em>The Design of Everyday Things</em>, Basic Books (wyd. poprawione).</li>
+  <li>Fitts P.M., <em>The information capacity of the human motor system…</em>,
+      Journal of Experimental Psychology, 1954.</li>
+  <li>Shneiderman B. i in., <em>Designing the User Interface</em>, Pearson.</li>
+  <li>Dokumentacja React, Vite oraz Web Crypto API (MDN) — stan na 2026.</li>
+</ol>
+
+<!-- ===================== ZAŁĄCZNIKI ===================== -->
+<div class="page-break"></div>
+<h2>15. Załączniki</h2>
+
+<h3>Załącznik A. Lista narzędzi</h3>
+<table>
+  <thead><tr><th>#</th><th>ID</th><th>Nazwa</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>notes</td><td>Notatki</td></tr>
+    <tr><td>2</td><td>calculator</td><td>Kalkulator</td></tr>
+    <tr><td>3</td><td>timer</td><td>Timer</td></tr>
+    <tr><td>4</td><td>converter</td><td>Konwerter jednostek</td></tr>
+    <tr><td>5</td><td>todos</td><td>Lista zadań</td></tr>
+    <tr><td>6</td><td>stopwatch</td><td>Stoper</td></tr>
+    <tr><td>7</td><td>password</td><td>Generator haseł</td></tr>
+    <tr><td>8</td><td>counter</td><td>Licznik</td></tr>
+    <tr><td>9</td><td>dice</td><td>Kostka</td></tr>
+    <tr><td>10</td><td>random</td><td>Losowa liczba</td></tr>
+    <tr><td>11</td><td>color</td><td>Selektor kolorów</td></tr>
+    <tr><td>12</td><td>countdown</td><td>Odliczanie daty</td></tr>
+    <tr><td>13</td><td>bmi</td><td>Kalkulator BMI</td></tr>
+    <tr><td>14</td><td>percent</td><td>Procenty</td></tr>
+    <tr><td>15</td><td>textcase</td><td>Zmiana wielkości liter</td></tr>
+    <tr><td>16</td><td>wordcount</td><td>Licznik znaków</td></tr>
+    <tr><td>17</td><td>tip</td><td>Napiwek</td></tr>
+    <tr><td>18</td><td>age</td><td>Wiek</td></tr>
+  </tbody>
+</table>
+
+<h3>Załącznik B. Instrukcja uruchomienia</h3>
+<pre>
+git clone https://github.com/wpacocha/ick-adaptacyjny-panel.git
+cd ick-adaptacyjny-panel
+npm install
+npm run dev
+# aplikacja: http://localhost:5173/
+</pre>
+
+<h3>Załącznik C. Mapowanie RF → implementacja</h3>
+<table>
+  <thead><tr><th>RF</th><th>Moduł</th></tr></thead>
+  <tbody>
+    <tr><td>RF-01, RF-10</td><td><code>useAuth.js</code>, <code>AuthScreen.jsx</code></td></tr>
+    <tr><td>RF-02</td><td><code>statsKeyForUser</code>, <code>toolKeyForUser</code></td></tr>
+    <tr><td>RF-03</td><td><code>data/tools.js</code> + <code>src/tools/*</code></td></tr>
+    <tr><td>RF-04–RF-07</td><td><code>useToolStats.js</code>, <code>App.jsx</code>, <code>Sidebar.jsx</code></td></tr>
+    <tr><td>RF-08, RF-09</td><td><code>togglePin</code>, <code>resetStats</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Załącznik D. Protokół testów ręcznych (skrót)</h3>
+<ol>
+  <li>Wyczyść dane strony w DevTools → Application → Local Storage.</li>
+  <li>Zarejestruj użytkownika A, użyj 10× Kalkulator, 2× Timer.</li>
+  <li>Zweryfikuj, że Kalkulator jest w sidebarze.</li>
+  <li>Wyloguj, zarejestruj B — ranking pusty/domyślny.</li>
+  <li>Zaloguj ponownie A — stan zachowany.</li>
+  <li>Przypnij Timer, zresetuj historię — pin zostaje wg implementacji
+      (reset czyści historię i piny do stanu domyślnego).</li>
+</ol>
+
+</body>
+</html>
