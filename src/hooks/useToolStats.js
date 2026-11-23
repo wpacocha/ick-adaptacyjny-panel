@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { statsKeyForUser } from '../auth/storage'
 import { RECENT_LIMIT, SIDEBAR_LIMIT, tools } from '../data/tools'
 
-/** Po tylu dniach pojedyncze użycie traci połowę wagi. */
 export const HALF_LIFE_DAYS = 7
 const MAX_HISTORY = 120
 const DAY_MS = 86400000
@@ -10,7 +9,7 @@ const DAY_MS = 86400000
 function createDefaultStats() {
   const entries = {}
   for (const tool of tools) {
-    entries[tool.id] = { uses: 0, lastUsed: 0, pinned: false, history: [] }
+    entries[tool.id] = { uses: 0, lastUsed: 0, pinned: false, pinOrder: 0, history: [] }
   }
   return entries
 }
@@ -19,6 +18,7 @@ function normalizeEntry(raw) {
   const uses = Number(raw?.uses) || 0
   const lastUsed = Number(raw?.lastUsed) || 0
   const pinned = Boolean(raw?.pinned)
+  const pinOrder = Number(raw?.pinOrder) || 0
   let history = Array.isArray(raw?.history)
     ? raw.history.map(Number).filter((t) => Number.isFinite(t) && t > 0)
     : []
@@ -31,6 +31,7 @@ function normalizeEntry(raw) {
     uses: history.length > 0 ? history.length : uses,
     lastUsed: lastUsed || (history.length ? Math.max(...history) : 0),
     pinned,
+    pinOrder: pinned ? pinOrder || lastUsed || 1 : 0,
     history: history.slice(-MAX_HISTORY),
   }
 }
@@ -51,7 +52,7 @@ function loadStats(userId) {
   }
 }
 
-/** Waga pojedynczego użycia: dziś ≈ 1, po tygodniu ≈ 0.5, po 2 tyg. ≈ 0.25 */
+/** dziś ≈ 1, po tygodniu ≈ 0.5, po 2 tyg. ≈ 0.25 */
 export function useWeight(timestamp, now = Date.now()) {
   const daysAgo = Math.max(0, (now - timestamp) / DAY_MS)
   return Math.pow(0.5, daysAgo / HALF_LIFE_DAYS)
@@ -68,12 +69,19 @@ function formatScore(score) {
   return String(Math.round(score))
 }
 
+function nextPinOrder(stats) {
+  let max = 0
+  for (const entry of Object.values(stats)) {
+    if (entry?.pinned && entry.pinOrder > max) max = entry.pinOrder
+  }
+  return max + 1
+}
+
 export function useToolStats(userId) {
   const [stats, setStats] = useState(() => loadStats(userId))
   const [activeId, setActiveId] = useState(null)
   const [now, setNow] = useState(() => Date.now())
 
-  // Przy zmianie użytkownika przeładuj jego panel.
   useEffect(() => {
     setStats(loadStats(userId))
     setActiveId(null)
@@ -101,7 +109,13 @@ export function useToolStats(userId) {
     const ts = Date.now()
     setNow(ts)
     setStats((prev) => {
-      const current = prev[id] || { uses: 0, lastUsed: 0, pinned: false, history: [] }
+      const current = prev[id] || {
+        uses: 0,
+        lastUsed: 0,
+        pinned: false,
+        pinOrder: 0,
+        history: [],
+      }
       const history = [...(current.history || []), ts].slice(-MAX_HISTORY)
       return {
         ...prev,
@@ -124,10 +138,49 @@ export function useToolStats(userId) {
   )
 
   const togglePin = useCallback((id) => {
-    setStats((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], pinned: !prev[id]?.pinned },
-    }))
+    setStats((prev) => {
+      const current = prev[id] || {
+        uses: 0,
+        lastUsed: 0,
+        pinned: false,
+        pinOrder: 0,
+        history: [],
+      }
+      if (current.pinned) {
+        return {
+          ...prev,
+          [id]: { ...current, pinned: false, pinOrder: 0 },
+        }
+      }
+      return {
+        ...prev,
+        [id]: { ...current, pinned: true, pinOrder: nextPinOrder(prev) },
+      }
+    })
+  }, [])
+
+  const movePin = useCallback((id, direction) => {
+    setStats((prev) => {
+      const pinnedIds = tools
+        .filter((t) => prev[t.id]?.pinned)
+        .sort((a, b) => (prev[a.id].pinOrder || 0) - (prev[b.id].pinOrder || 0))
+        .map((t) => t.id)
+
+      const index = pinnedIds.indexOf(id)
+      if (index < 0) return prev
+      const swapWith = index + direction
+      if (swapWith < 0 || swapWith >= pinnedIds.length) return prev
+
+      const otherId = pinnedIds[swapWith]
+      const orderA = prev[id].pinOrder
+      const orderB = prev[otherId].pinOrder
+
+      return {
+        ...prev,
+        [id]: { ...prev[id], pinOrder: orderB },
+        [otherId]: { ...prev[otherId], pinOrder: orderA },
+      }
+    })
   }, [])
 
   const resetStats = useCallback(() => {
@@ -136,25 +189,37 @@ export function useToolStats(userId) {
   }, [])
 
   const sortedTools = useMemo(() => {
-    const compare = (a, b) => {
+    const byScore = (a, b) => {
       const sa = stats[a.id]
       const sb = stats[b.id]
-      if (sa.pinned !== sb.pinned) return sa.pinned ? -1 : 1
       const scoreDiff = scores[b.id] - scores[a.id]
       if (Math.abs(scoreDiff) > 0.0001) return scoreDiff
       if (sa.lastUsed !== sb.lastUsed) return sb.lastUsed - sa.lastUsed
       return a.name.localeCompare(b.name, 'pl')
     }
 
-    const pinned = tools.filter((t) => stats[t.id]?.pinned).sort(compare)
-    const unpinned = tools.filter((t) => !stats[t.id]?.pinned).sort(compare)
+    const pinned = tools
+      .filter((t) => stats[t.id]?.pinned)
+      .sort((a, b) => (stats[a.id].pinOrder || 0) - (stats[b.id].pinOrder || 0))
+
+    const unpinned = tools.filter((t) => !stats[t.id]?.pinned).sort(byScore)
     return [...pinned, ...unpinned]
   }, [stats, scores])
 
-  const sidebarTools = useMemo(
-    () => sortedTools.slice(0, SIDEBAR_LIMIT),
-    [sortedTools],
+  const pinnedTools = useMemo(
+    () => sortedTools.filter((t) => stats[t.id]?.pinned),
+    [sortedTools, stats],
   )
+
+  const sidebarTools = useMemo(() => {
+    const pinned = pinnedTools
+    if (pinned.length >= SIDEBAR_LIMIT) return pinned.slice(0, SIDEBAR_LIMIT)
+
+    const rest = sortedTools
+      .filter((t) => !stats[t.id]?.pinned)
+      .slice(0, SIDEBAR_LIMIT - pinned.length)
+    return [...pinned, ...rest]
+  }, [pinnedTools, sortedTools, stats])
 
   const recentTools = useMemo(() => {
     return [...tools]
@@ -177,31 +242,16 @@ export function useToolStats(userId) {
       const score = scores[id] || 0
       const reasons = []
       if (s.pinned) {
-        reasons.push('przypięte przez Ciebie — pozycja jest stała')
+        reasons.push('przypięte przez Ciebie — kolejność ustawiasz sam')
       }
       if (s.uses === 0) {
-        reasons.push(
-          'jeszcze nieużywane — w domyślnej kolejności alfabetycznej wśród niewykorzystanych',
-        )
+        reasons.push('jeszcze nieużywane')
       } else {
         reasons.push(`${s.uses} użyć · waga ${formatScore(score)}`)
-        reasons.push(
-          `świeższe kliknięcia liczą się bardziej (połowa wagi po ${HALF_LIFE_DAYS} dniach)`,
-        )
-        const rank = sortedTools.findIndex((t) => t.id === id) + 1
-        reasons.push(`pozycja ${rank} z ${tools.length}`)
-        if (rank <= SIDEBAR_LIMIT) {
-          reasons.push(`w top ${SIDEBAR_LIMIT} skrótach z lewej`)
-        } else if (!s.pinned) {
-          reasons.push('kolejność wynika z aktualnej wagi użyć')
-        }
-      }
-      if (s.lastUsed) {
-        reasons.push(`ostatnio: ${formatRelative(s.lastUsed, now)}`)
       }
       return reasons.join(' · ')
     },
-    [stats, sortedTools, scores, now],
+    [stats, scores],
   )
 
   const buttonScale = useCallback(
@@ -220,8 +270,10 @@ export function useToolStats(userId) {
     setActiveId,
     openTool,
     togglePin,
+    movePin,
     resetStats,
     sortedTools,
+    pinnedTools,
     sidebarTools,
     recentTools,
     explainTool,
@@ -229,16 +281,4 @@ export function useToolStats(userId) {
     maxScore,
     formatScore,
   }
-}
-
-function formatRelative(ts, now = Date.now()) {
-  const diff = now - ts
-  const sec = Math.floor(diff / 1000)
-  if (sec < 60) return 'przed chwilą'
-  const min = Math.floor(sec / 60)
-  if (min < 60) return `${min} min temu`
-  const h = Math.floor(min / 60)
-  if (h < 24) return `${h} godz. temu`
-  const d = Math.floor(h / 24)
-  return `${d} dni temu`
 }

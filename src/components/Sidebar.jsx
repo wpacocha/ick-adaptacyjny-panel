@@ -5,11 +5,13 @@ export default function Sidebar({
   activeId,
   onOpen,
   onTogglePin,
+  onMovePin,
   onReset,
   confirmReset,
-  onShowAll,
   onLogout,
 }) {
+  const pinnedInSidebar = sidebarTools.filter((t) => stats[t.id]?.pinned)
+
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -30,11 +32,12 @@ export default function Sidebar({
       </div>
 
       <section className="nav-section">
-        <h2>Najczęściej używane</h2>
+        <h2>Skróty</h2>
         <div className="nav-list">
           {sidebarTools.map((tool) => {
             const s = stats[tool.id]
             const isActive = activeId === tool.id
+            const pinnedIndex = pinnedInSidebar.findIndex((t) => t.id === tool.id)
 
             return (
               <div key={tool.id} className="nav-item-wrap">
@@ -51,24 +54,46 @@ export default function Sidebar({
                     <span className="nav-name">{tool.name}</span>
                   </span>
                 </button>
-                <button
-                  type="button"
-                  className={`pin-btn${s.pinned ? ' pinned' : ''}`}
-                  onClick={() => onTogglePin(tool.id)}
-                  title={s.pinned ? 'Odepnij' : 'Przypnij'}
-                  aria-label={s.pinned ? 'Odepnij' : 'Przypnij'}
-                >
-                  📌
-                </button>
+                <div className="nav-actions">
+                  {s.pinned && (
+                    <div className="pin-order-btns">
+                      <button
+                        type="button"
+                        className="icon-btn tiny"
+                        onClick={() => onMovePin(tool.id, -1)}
+                        disabled={pinnedIndex <= 0}
+                        title="Wyżej"
+                        aria-label="Przenieś wyżej"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        className="icon-btn tiny"
+                        onClick={() => onMovePin(tool.id, 1)}
+                        disabled={pinnedIndex < 0 || pinnedIndex >= pinnedInSidebar.length - 1}
+                        title="Niżej"
+                        aria-label="Przenieś niżej"
+                      >
+                        ↓
+                      </button>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    className={`pin-btn${s.pinned ? ' pinned' : ''}`}
+                    onClick={() => onTogglePin(tool.id)}
+                    title={s.pinned ? 'Odepnij' : 'Przypnij'}
+                    aria-label={s.pinned ? 'Odepnij' : 'Przypnij'}
+                  >
+                    📌
+                  </button>
+                </div>
               </div>
             )
           })}
         </div>
       </section>
-
-      <button type="button" className="btn ghost full" onClick={onShowAll}>
-        Wszystkie narzędzia
-      </button>
 
       <div className="sidebar-footer">
         <button
