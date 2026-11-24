@@ -72,6 +72,24 @@
       vertical-align: top;
     }
     th { background: #eee; text-align: left; }
+    table.req-func {
+      table-layout: fixed;
+    }
+    table.req-func col.col-id { width: 18%; }
+    table.req-func col.col-desc { width: 62%; }
+    table.req-func col.col-prio { width: 20%; }
+    table.req-func th:first-child,
+    table.req-func td:first-child {
+      white-space: nowrap;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 700;
+      text-align: center;
+    }
+    table.req-func th:last-child,
+    table.req-func td:last-child {
+      text-align: center;
+      white-space: nowrap;
+    }
     pre, code {
       font-family: "Courier New", Courier, monospace;
       font-size: 9pt;
@@ -186,7 +204,7 @@
           <td>Informatyka Techniczna</td>
         </tr>
         <tr>
-          <td>Oliwia Obiegla</td>
+          <td>Oliwia Obiegła</td>
           <td>272574</td>
           <td>Informatyka Techniczna</td>
         </tr>
@@ -200,7 +218,7 @@
 <h2 id="sec-1">1. Streszczenie</h2>
 <p>
 <strong>Autorzy sprawozdania:</strong> Wojciech Pacocha (nr albumu 272534),
-Oliwia Obiegla (nr albumu 272574) — Informatyka Techniczna, Politechnika Wrocławska.
+Oliwia Obiegła (nr albumu 272574) — Informatyka Techniczna, Politechnika Wrocławska.
 </p>
 <p>
 Niniejsze sprawozdanie dokumentuje projekt i implementację aplikacji webowej stanowiącej
@@ -317,7 +335,12 @@ element UI, (3)&nbsp;użytkownik ma pin, ukrywanie i reset, (4)&nbsp;dane są iz
 Zestaw wymagań funkcjonalnych przedstawia <a class="ref" href="#tab-1">Tabela&nbsp;1</a>.
 Względem pierwszej wersji projektu dopisano RF-11–RF-13 (skróty webowe i ukrywanie).
 </p>
-<table id="tab-1-table">
+<table id="tab-1-table" class="req-func">
+  <colgroup>
+    <col class="col-id" />
+    <col class="col-desc" />
+    <col class="col-prio" />
+  </colgroup>
   <thead><tr><th>ID</th><th>Opis</th><th>Priorytet</th></tr></thead>
   <tbody>
     <tr><td>RF-01</td><td>Rejestracja i logowanie lokalnego konta</td><td>wysoki</td></tr>
@@ -844,92 +867,45 @@ wpisu <code>stats</code> przy pierwszym dodaniu skrótu webowego).
 <div class="page-break"></div>
 <h3 id="sec-11-7">11.7. Dokumentacja fotograficzna testów manualnych</h3>
 <p>
-Poniższa zakładka służy do wstawienia zrzutów ekranu odpowiadających scenariuszom
-z <a class="ref" href="#tab-6">Tabeli&nbsp;6</a>. W wersji roboczej miejsca są oznaczone ramkami;
-w wersji finalnej należy zastąpić je plikami obrazów (np. <code>&lt;img src="ss/s1.png" alt="..."&gt;</code>).
+Poniżej zamieszczono zrzuty ekranu odpowiadające scenariuszom
+z <a class="ref" href="#tab-6">Tabeli&nbsp;6</a>
+(<a class="ref" href="#rys-2">Rys.&nbsp;2</a>–<a class="ref" href="#rys-8">Rys.&nbsp;8</a>).
+Pliki źródłowe znajdują się w katalogu <code>sprawozdanie/ss/</code>.
 </p>
-<div class="ss-hint">
-  <strong>Jak wstawić SS:</strong> zapisz zrzuty w folderze <code>sprawozdanie/ss/</code>
-  (np. <code>s1-auth.png</code> … <code>s7-ukryte.png</code>), a w każdej ramce poniżej zamień
-  zawartość na znacznik <code>img</code> wskazujący ten plik. Podpisy (<a class="ref" href="#rys-2">Rys.&nbsp;2</a>–<a class="ref" href="#rys-8">Rys.&nbsp;8</a>)
-  zostaw bez zmian, żeby odnośniki ze <a class="ref" href="#tab-6">Tabeli&nbsp;6</a> działały.
-</div>
 
 <div class="ss-grid">
   <figure>
-    <div class="ss-slot">
-      <div>
-        <strong>Miejsce na zrzut — scenariusz S1</strong>
-        Ekran rejestracji / pierwsze otwarcie kalkulatora<br />
-        <span class="small">np. <code>ss/s1-rejestracja-kalkulator.png</code></span>
-      </div>
-    </div>
+    <img src="ss/s1-rejestracja-kalkulator.png" alt="S1: panel po rejestracji z otwartym kalkulatorem" />
     <p class="fig-cap" id="rys-2">Rys. 2. S1 — nowe konto i otwarcie kalkulatora</p>
   </figure>
 
   <figure>
-    <div class="ss-slot">
-      <div>
-        <strong>Miejsce na zrzut — scenariusz S2</strong>
-        Sidebar z narzędziem w top&nbsp;5 po wielokrotnym użyciu<br />
-        <span class="small">np. <code>ss/s2-sidebar-top.png</code></span>
-      </div>
-    </div>
+    <img src="ss/s2-sidebar-top.png" alt="S2: kalkulator w skrótach bocznych" />
     <p class="fig-cap" id="rys-3">Rys. 3. S2 — narzędzie w skrótach bocznych</p>
   </figure>
 
   <figure>
-    <div class="ss-slot">
-      <div>
-        <strong>Miejsce na zrzut — scenariusz S3</strong>
-        Przypięte Notatki na górze listy<br />
-        <span class="small">np. <code>ss/s3-pin.png</code></span>
-      </div>
-    </div>
+    <img src="ss/s3-pin.png" alt="S3: przypięte Notatki w sekcji Przypięte" />
     <p class="fig-cap" id="rys-4">Rys. 4. S3 — przypinanie narzędzia</p>
   </figure>
 
   <figure>
-    <div class="ss-slot">
-      <div>
-        <strong>Miejsce na zrzut — scenariusz S4</strong>
-        Drugie konto z niezależnym rankingiem<br />
-        <span class="small">np. <code>ss/s4-drugie-konto.png</code></span>
-      </div>
-    </div>
+    <img src="ss/s4-drugie-konto.png" alt="S4: drugie konto z domyślnym rankingiem" />
     <p class="fig-cap" id="rys-5">Rys. 5. S4 — izolacja personalizacji między kontami</p>
   </figure>
 
   <figure>
-    <div class="ss-slot">
-      <div>
-        <strong>Miejsce na zrzut — scenariusz S5</strong>
-        Potwierdzenie resetu historii<br />
-        <span class="small">np. <code>ss/s5-reset.png</code></span>
-      </div>
-    </div>
+    <img src="ss/s5-reset.png" alt="S5: potwierdzenie resetu historii" />
     <p class="fig-cap" id="rys-6">Rys. 6. S5 — reset historii</p>
   </figure>
 
   <figure>
-    <div class="ss-slot">
-      <div>
-        <strong>Miejsce na zrzut — scenariusz S6</strong>
-        Modal „+” / karta skrótu Gmail z favikoną<br />
-        <span class="small">np. <code>ss/s6-gmail.png</code></span>
-      </div>
-    </div>
+    <img src="ss/s6-gmail.png" alt="S6: modal dodawania aplikacji Gmail" />
     <p class="fig-cap" id="rys-7">Rys. 7. S6 — dodanie aplikacji webowej</p>
   </figure>
 
   <figure>
-    <div class="ss-slot">
-      <div>
-        <strong>Miejsce na zrzut — scenariusz S7</strong>
-        Zakładka „Ukryte” po rozwinięciu<br />
-        <span class="small">np. <code>ss/s7-ukryte.png</code></span>
-      </div>
-    </div>
+    <img src="ss/s7-ukryte.png" alt="S7: rozwinięta zakładka Ukryte z Kostką" />
     <p class="fig-cap" id="rys-8">Rys. 8. S7 — ukrywanie i przywracanie narzędzi</p>
   </figure>
 </div>

@@ -6,7 +6,7 @@ Aplikacja webowa z interfejsem adaptacyjnym: każdy użytkownik ma własny panel
 
 ## Autorzy
 
-- Oliwia Obiegla (272574)
+- Oliwia Obiegła (272574)
 - Wojciech Pacocha (272534)
 
 ## Uruchomienie
