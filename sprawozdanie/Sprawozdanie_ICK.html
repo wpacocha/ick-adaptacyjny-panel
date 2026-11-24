@@ -10,6 +10,7 @@
       --muted: #444;
       --line: #ccc;
       --code-bg: #f4f4f4;
+      --accent: #0f766e;
     }
     * { box-sizing: border-box; }
     body {
@@ -49,10 +50,19 @@
     .meta { margin: 0.35em 0; }
     .toc a { color: inherit; text-decoration: none; }
     .toc li { margin: 0.25em 0; }
+    a.ref {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dotted color-mix(in srgb, var(--accent) 45%, white);
+      font-weight: 600;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 0.95em;
+    }
+    a.ref:hover { border-bottom-style: solid; }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 0.9em 0;
+      margin: 0.9em 0 0.2em;
       font-size: 10.5pt;
       page-break-inside: avoid;
     }
@@ -74,12 +84,14 @@
       white-space: pre-wrap;
       page-break-inside: avoid;
       line-height: 1.35;
+      margin-bottom: 0.2em;
     }
     .listing-cap, .fig-cap, .tab-cap {
       font-size: 10pt;
       font-style: italic;
       text-align: center;
       margin: 0.3em 0 1em;
+      scroll-margin-top: 1rem;
     }
     .formula {
       text-align: center;
@@ -87,12 +99,58 @@
       font-size: 12pt;
       page-break-inside: avoid;
     }
-    .formula-num { float: right; }
     ul, ol { margin: 0.4em 0 0.8em 1.3em; }
     li { margin: 0.2em 0; }
     .page-break { page-break-before: always; }
     .small { font-size: 10pt; }
-    .sig { margin-top: 2em; }
+    figure { margin: 0.8em 0; }
+    figure img {
+      display: block;
+      max-width: 100%;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+    }
+    .ss-slot {
+      border: 1.5px dashed #9aa8a3;
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          #f7faf8,
+          #f7faf8 8px,
+          #eef3f0 8px,
+          #eef3f0 16px
+        );
+      min-height: 70mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--muted);
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 10pt;
+      padding: 1em;
+      page-break-inside: avoid;
+    }
+    .ss-slot strong { display: block; color: var(--ink); margin-bottom: 0.35em; }
+    .ss-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.2em;
+      margin: 1em 0;
+    }
+    @media screen {
+      .ss-hint {
+        background: #ecfdf5;
+        border: 1px solid #99f6e4;
+        padding: 0.7em 0.9em;
+        font-size: 10pt;
+        margin: 0.8em 0 1.2em;
+      }
+    }
+    @media print {
+      .ss-hint { display: none; }
+      a.ref { color: inherit; border-bottom: none; }
+    }
   </style>
 </head>
 <body>
@@ -139,48 +197,57 @@
 </section>
 
 <!-- ===================== STRESZCZENIE ===================== -->
-<h2>1. Streszczenie</h2>
+<h2 id="sec-1">1. Streszczenie</h2>
 <p>
 <strong>Autorzy sprawozdania:</strong> Wojciech Pacocha (nr albumu 272534),
 Oliwia Obiegla (nr albumu 272574) — Informatyka Techniczna, Politechnika Wrocławska.
 </p>
 <p>
 Niniejsze sprawozdanie dokumentuje projekt i implementację aplikacji webowej stanowiącej
-<strong>adaptacyjny panel narzędzi</strong>. System automatycznie porządkuje listę narzędzi na podstawie
-historii interakcji użytkownika, stosując <strong>ważenie czasowe użyć</strong> (zanik wykładniczy
-z okresem połowicznym 7 dni). Każdy użytkownik posiada oddzielne konto lokalne oraz niezależny
-stan personalizacji przechowywany w przeglądarce (<code>localStorage</code>).
+<strong>adaptacyjny panel narzędzi</strong>. System porządkuje listę narzędzi na podstawie
+historii interakcji użytkownika, stosując model <strong>udziału w aktywności dnia i tygodnia</strong>
+z zanikiem czasowym (zamiast surowej sumy kliknięć). Dzięki temu intensywny okres korzystania
+nie dominuje rankingu względem spokojniejszych dni — liczy się proporcja użyć. Każdy użytkownik
+posiada oddzielne konto lokalne oraz niezależny stan personalizacji w przeglądarce
+(<code>localStorage</code>). Panel obsługuje także własne skróty do aplikacji webowych (URL + favikona),
+ukrywanie niepotrzebnych pozycji oraz przypinanie.
 </p>
 <p>
-W pracy przedstawiono podstawy teoretyczne interfejsów adaptacyjnych, analizę wymagań,
-architekturę rozwiązania, formalny opis algorytmu scoringu, listingi kluczowych fragmentów kodu,
-a także wyniki badań: ewaluacji heurystycznej, przejścia kognitywnego oraz eksperymentu
-porównawczego (licznik użyć vs. waga czasowa). Kod źródłowy opublikowano w repozytorium:
+W pracy przedstawiono podstawy teoretyczne interfejsów adaptacyjnych, analizę wymagań
+(por.&nbsp;<a class="ref" href="#tab-1">Tabela&nbsp;1</a> i <a class="ref" href="#tab-2">Tabela&nbsp;2</a>),
+architekturę rozwiązania (por.&nbsp;<a class="ref" href="#rys-1">Rys.&nbsp;1</a>), formalny opis algorytmu scoringu,
+listingi kluczowych fragmentów kodu (m.in.&nbsp;<a class="ref" href="#listing-3">Listing&nbsp;3</a>),
+a także wyniki badań oraz miejsce na dokumentację fotograficzną testów manualnych
+(por.&nbsp;<a class="ref" href="#sec-11-7">rozdz.&nbsp;11.7</a>). Kod źródłowy:
 <code>https://github.com/wpacocha/ick-adaptacyjny-panel</code>.
 </p>
 
-<h2>2. Spis treści</h2>
+<h2 id="sec-2">2. Spis treści</h2>
 <ol class="toc">
-  <li>Streszczenie</li>
-  <li>Spis treści</li>
-  <li>Wprowadzenie i cel projektu</li>
-  <li>Podstawy teoretyczne i przegląd literatury</li>
-  <li>Analiza wymagań</li>
-  <li>Koncepcja rozwiązania</li>
-  <li>Architektura systemu</li>
-  <li>Algorytm personalizacji</li>
-  <li>Implementacja (listingi)</li>
-  <li>Bezpieczeństwo kont lokalnych</li>
-  <li>Metodyka i wyniki badań</li>
-  <li>Dyskusja</li>
-  <li>Wnioski</li>
-  <li>Literatura</li>
-  <li>Załączniki</li>
+  <li><a href="#sec-1">Streszczenie</a></li>
+  <li><a href="#sec-2">Spis treści</a></li>
+  <li><a href="#sec-3">Wprowadzenie i cel projektu</a></li>
+  <li><a href="#sec-4">Podstawy teoretyczne i przegląd literatury</a></li>
+  <li><a href="#sec-5">Analiza wymagań</a></li>
+  <li><a href="#sec-6">Koncepcja rozwiązania</a></li>
+  <li><a href="#sec-7">Architektura systemu</a></li>
+  <li><a href="#sec-8">Algorytm personalizacji</a></li>
+  <li><a href="#sec-9">Implementacja (listingi)</a></li>
+  <li><a href="#sec-10">Bezpieczeństwo kont lokalnych</a></li>
+  <li><a href="#sec-11">Metodyka i wyniki badań</a>
+    <ol>
+      <li><a href="#sec-11-7">Dokumentacja fotograficzna testów manualnych</a></li>
+    </ol>
+  </li>
+  <li><a href="#sec-12">Dyskusja</a></li>
+  <li><a href="#sec-13">Wnioski</a></li>
+  <li><a href="#sec-14">Literatura</a></li>
+  <li><a href="#sec-15">Załączniki</a></li>
 </ol>
 
 <!-- ===================== WPROWADZENIE ===================== -->
 <div class="page-break"></div>
-<h2>3. Wprowadzenie i cel projektu</h2>
+<h2 id="sec-3">3. Wprowadzenie i cel projektu</h2>
 <p>
 W typowych aplikacjach narzędziowych wszystkie funkcje mają stałe miejsce w menu, niezależnie
 od tego, jak często są używane. Przy kilkunastu narzędziach prowadzi to do zwiększonego
@@ -190,7 +257,7 @@ aplikacji, która:
 <ol>
   <li>ogranicza liczbę czynności potrzebnych do dostępu do najczęściej używanych funkcji,</li>
   <li>zmniejsza przeładowanie głównego widoku poprzez wyróżnienie skrótów (top&nbsp;5),</li>
-  <li>zachowuje kontrolę użytkownika (przypinanie, reset historii, konta),</li>
+  <li>zachowuje kontrolę użytkownika (przypinanie, ukrywanie, własne skróty webowe, reset, konta),</li>
   <li>pozostaje przewidywalna — reguły adaptacji są proste i jawne (bez „czarnej skrzynki” ML).</li>
 </ol>
 <p>
@@ -199,20 +266,20 @@ personalizacji, redukcji złożoności oraz rozpoznawania zamiast przypominania.
 </p>
 
 <!-- ===================== TEORIA ===================== -->
-<h2>4. Podstawy teoretyczne i przegląd literatury</h2>
+<h2 id="sec-4">4. Podstawy teoretyczne i przegląd literatury</h2>
 
 <h3>4.1. Interfejsy adaptacyjne a personalizowane</h3>
 <p>
 W literaturze HCI rozróżnia się <em>adaptację</em> (system sam zmienia UI na podstawie danych
 o zachowaniu) oraz <em>personalizację</em> (użytkownik świadomie konfiguruje UI)
 [Findlater, McGrenere 2004; Gajos i in. 2006]. W projekcie zastosowano model mieszany
-(<em>mixed-initiative</em>): ranking powstaje automatycznie, ale użytkownik może przypiąć narzędzie
-lub zresetować historię.
+(<em>mixed-initiative</em>): ranking powstaje automatycznie, ale użytkownik może przypiąć narzędzie,
+ukryć je, dodać własny skrót webowy lub zresetować historię.
 </p>
 
 <h3>4.2. Koszt interakcji i prawo Fittsa</h3>
 <p>
-Skrócenie ścieżki do częstych funkcji zmniejsza średni czas zadania celu. Zgodnie
+Skrócenie ścieżki do częstych funkcji zmniejsza średni czas osiągnięcia celu. Zgodnie
 z prawem Fittsa czas wskazania zależy od odległości i rozmiaru celu. Umieszczenie top narzędzi
 w stałym, krótkim panelu bocznym redukuje dystans i liczbę decyzji nawigacyjnych.
 </p>
@@ -220,47 +287,58 @@ w stałym, krótkim panelu bocznym redukuje dystans i liczbę decyzji nawigacyjn
 <h3>4.3. Rozpoznawanie zamiast przypominania</h3>
 <p>
 Heurystyka Nielsena „Recognition rather than recall” [Nielsen 1994] wskazuje, że UI powinno
-pokazywać dostępne opcje zamiast wymagać pamiętania ich lokalizacji. Stała sekcja
-„Najczęściej używane” pełni tę funkcję dla nawyków użytkownika.
+pokazywać dostępne opcje zamiast wymagać pamiętania ich lokalizacji. Stała sekcja skrótów
+oraz siatka narzędzi pełnią tę funkcję dla nawyków użytkownika.
 </p>
 
-<h3>4.4. Predykcja z zanikiem czasowym</h3>
+<h3>4.4. Predykcja z udziałem i zanikiem czasowym</h3>
 <p>
-Proste zliczanie użyć faworyzuje narzędzia popularne w przeszłości, nawet gdy preferencje
-się zmieniły. Model z <em>half-life</em> (zanik wykładniczy) jest stosowany m.in. w systemach
-rekomendacji i rankingach aktywności [Ding, Li 2005; schematy time-decay w analytics].
-Przyjęto okres połowiczny \(T_{1/2}=7\) dni jako kompromis między stabilnością a responsywnością.
+Proste zliczanie użyć faworyzuje narzędzia popularne w okresach wysokiej aktywności globalnej
+(np. intensywny tydzień sesji), nawet gdy proporcje preferencji były inne. Dlatego ranking
+oparto na <strong>udziale narzędzia w aktywności danego dnia i tygodnia</strong>, a dopiero potem
+zastosowano zanik wykładniczy względem wieku kubełka czasu. Modele time-decay są znane
+z rekomendacji [Ding, Li 2005]; tu półokres dotyczy świeżości <em>dnia</em> (7&nbsp;dni) oraz
+<em>tygodnia</em> (2&nbsp;tygodnie), a nie każdego kliknięcia osobno. Formalny opis zawiera
+<a class="ref" href="#sec-8">rozdział&nbsp;8</a>.
 </p>
 
 <h3>4.5. Kontrola i zaufanie</h3>
 <p>
 Nieprzewidywalna adaptacja obniża satysfakcję [Findlater, McGrenere 2004]. Dlatego:
-(1)&nbsp;reguły sortowania są deterministyczne, (2)&nbsp;wagi nie są eksponowane w UI (uniknięcie szumu
-informacyjnego), (3)&nbsp;użytkownik ma pin i reset, (4)&nbsp;dane są izolowane per konto.
+(1)&nbsp;reguły sortowania są deterministyczne, (2)&nbsp;surowy score nie jest eksponowany jako główny
+element UI, (3)&nbsp;użytkownik ma pin, ukrywanie i reset, (4)&nbsp;dane są izolowane per konto.
 </p>
 
 <!-- ===================== WYMAGANIA ===================== -->
-<h2>5. Analiza wymagań</h2>
+<h2 id="sec-5">5. Analiza wymagań</h2>
 
 <h3>5.1. Wymagania funkcjonalne (RF)</h3>
-<table>
+<p>
+Zestaw wymagań funkcjonalnych przedstawia <a class="ref" href="#tab-1">Tabela&nbsp;1</a>.
+Względem pierwszej wersji projektu dopisano RF-11–RF-13 (skróty webowe i ukrywanie).
+</p>
+<table id="tab-1-table">
   <thead><tr><th>ID</th><th>Opis</th><th>Priorytet</th></tr></thead>
   <tbody>
     <tr><td>RF-01</td><td>Rejestracja i logowanie lokalnego konta</td><td>wysoki</td></tr>
     <tr><td>RF-02</td><td>Izolacja historii i danych narzędzi per użytkownik</td><td>wysoki</td></tr>
     <tr><td>RF-03</td><td>Zestaw ≥15 prostych narzędzi</td><td>wysoki</td></tr>
     <tr><td>RF-04</td><td>Rejestracja każdego otwarcia narzędzia ze znacznikiem czasu</td><td>wysoki</td></tr>
-    <tr><td>RF-05</td><td>Sortowanie wg ważonej sumy użyć</td><td>wysoki</td></tr>
+    <tr><td>RF-05</td><td>Sortowanie wg udziału dzień/tydzień z zanikiem czasowym</td><td>wysoki</td></tr>
     <tr><td>RF-06</td><td>Sidebar z top 5 narzędzi</td><td>wysoki</td></tr>
     <tr><td>RF-07</td><td>Główny panel ze wszystkimi narzędziami w kolejności rankingu</td><td>wysoki</td></tr>
     <tr><td>RF-08</td><td>Przypinanie narzędzi (stała pozycja na górze)</td><td>wysoki</td></tr>
-    <tr><td>RF-09</td><td>Reset historii użytkownika</td><td>wysoki</td></tr>
+    <tr><td>RF-09</td><td>Reset historii użytkownika (z zachowaniem ukryć)</td><td>wysoki</td></tr>
     <tr><td>RF-10</td><td>Wylogowanie i przełączanie kont</td><td>średni</td></tr>
+    <tr><td>RF-11</td><td>Dodawanie własnych aplikacji webowych (URL, favikona, otwarcie w nowej karcie)</td><td>wysoki</td></tr>
+    <tr><td>RF-12</td><td>Ukrywanie narzędzi / skrótów i przywracanie z sekcji „Ukryte”</td><td>wysoki</td></tr>
+    <tr><td>RF-13</td><td>Usuwanie własnych skrótów webowych</td><td>średni</td></tr>
   </tbody>
 </table>
-<p class="tab-cap">Tabela 1. Wymagania funkcjonalne</p>
+<p class="tab-cap" id="tab-1">Tabela 1. Wymagania funkcjonalne</p>
 
 <h3>5.2. Wymagania niefunkcjonalne (RNF)</h3>
+<p>Wymagania niefunkcjonalne zebrano w <a class="ref" href="#tab-2">Tabeli&nbsp;2</a>.</p>
 <table>
   <thead><tr><th>ID</th><th>Opis</th></tr></thead>
   <tbody>
@@ -272,74 +350,72 @@ informacyjnego), (3)&nbsp;użytkownik ma pin i reset, (4)&nbsp;dane są izolowan
     <tr><td>RNF-06</td><td>Separacja logiki scoringu od warstwy widoku (hook)</td></tr>
   </tbody>
 </table>
-<p class="tab-cap">Tabela 2. Wymagania niefunkcjonalne</p>
+<p class="tab-cap" id="tab-2">Tabela 2. Wymagania niefunkcjonalne</p>
 
 <!-- ===================== KONCEPCJA ===================== -->
 <div class="page-break"></div>
-<h2>6. Koncepcja rozwiązania</h2>
+<h2 id="sec-6">6. Koncepcja rozwiązania</h2>
 <p>
 Aplikacja składa się z trzech warstw:
 </p>
 <ol>
   <li><strong>Auth</strong> — rejestracja/logowanie, sesja lokalna, izolacja danych,</li>
-  <li><strong>Stats engine</strong> — zbieranie historii użyć, scoring, sortowanie, pin/reset,</li>
-  <li><strong>UI</strong> — ekran logowania, sidebar (top&nbsp;5), siatka wszystkich narzędzi, widok aktywnego narzędzia.</li>
+  <li><strong>Stats / catalog engine</strong> — historia użyć, scoring udziałowy, pin/ukrywanie/reset, katalog wbudowany + skróty webowe,</li>
+  <li><strong>UI</strong> — ekran logowania, sidebar (top&nbsp;5), siatka narzędzi, modal dodawania URL, zakładka „Ukryte”, widok aktywnego narzędzia.</li>
 </ol>
 <p>
-Przy pierwszym wejściu użytkownik tworzy konto lub loguje się. Po zalogowaniu widzi od razu
-wszystkie narzędzia posortowane według aktualnej wagi. Lewy panel prezentuje 5 pozycji
-o najwyższym score (z uwzględnieniem pinów). Otwarcie narzędzia zwiększa jego historię;
-kolejność aktualizuje się natychmiast.
+Przy pierwszym wejściu użytkownik tworzy konto lub loguje się. Po zalogowaniu widzi narzędzia
+posortowane według aktualnego score. Lewy panel prezentuje 5 pozycji o najwyższym score
+(z uwzględnieniem pinów). Otwarcie narzędzia wbudowanego otwiera je w panelu; skrót webowy
+otwiera URL w nowej karcie. Schemat koncepcyjny pokazuje <a class="ref" href="#rys-1">Rys.&nbsp;1</a>.
 </p>
 
 <figure>
   <pre style="text-align:left; font-size:9pt;">
 [Ekran auth] --login/register--> [Panel]
                                    |
-                     +-------------+-------------+
-                     |             |             |
-                 Sidebar        Grid all      Tool view
-                 (top 5)      (sorted)      (active)
-                     |             |             |
-                     +------ useToolStats(userId) ------+
+                     +-------------+------------------+
+                     |             |                  |
+                 Sidebar        Grid (+ / Ukryte)   Tool view
+                 (top 5)        sorted + web apps   (active)
+                     |             |                  |
+                     +------ useToolStats + useCustomApps ------+
                                    |
                             localStorage
-                     (auth + stats:{userId} + tool data)
+              (auth + stats + webapps + tool data per user)
   </pre>
-  <p class="fig-cap">Rys. 1. Schemat koncepcyjny aplikacji</p>
+  <p class="fig-cap" id="rys-1">Rys. 1. Schemat koncepcyjny aplikacji</p>
 </figure>
 
 <!-- ===================== ARCHITEKTURA ===================== -->
-<h2>7. Architektura systemu</h2>
+<h2 id="sec-7">7. Architektura systemu</h2>
 
 <h3>7.1. Struktura katalogów</h3>
 <pre>
 src/
   auth/storage.js          # persystencja kont, hash haseł, klucze LS
   hooks/useAuth.js         # rejestracja / logowanie / wylogowanie
-  hooks/useToolStats.js    # scoring, sortowanie, pin, reset
+  hooks/useToolStats.js    # scoring udziałowy, sortowanie, pin/hide/reset
+  hooks/useCustomApps.js   # własne skróty webowe (URL + favikona)
   context/UserContext.jsx  # bieżący użytkownik dla narzędzi
   components/
     AuthScreen.jsx
     Sidebar.jsx
+    ToolIcon.jsx           # emoji lub favikona
   tools/                   # 18 niezależnych komponentów narzędzi
   data/tools.js            # rejestr narzędzi + SIDEBAR_LIMIT
-  App.jsx
+  App.jsx                  # siatka, modal dodawania, zakładka Ukryte
 </pre>
 
 <h3>7.2. Model danych użytkownika</h3>
+<p>
+Struktury przechowywane w <code>localStorage</code> przedstawia <a class="ref" href="#listing-1">Listing&nbsp;1</a>.
+Dodano klucz skrótów webowych oraz flagę <code>hidden</code> w statystykach.
+</p>
 <pre>
 // ick-auth-v1
 {
-  "users": [
-    {
-      "id": "uuid",
-      "username": "ola",
-      "salt": "hex...",
-      "passwordHash": "sha256-hex...",
-      "createdAt": 1730000000000
-    }
-  ],
+  "users": [{ "id": "uuid", "username": "ola", "salt": "...", "passwordHash": "..." }],
   "currentUserId": "uuid" | null
 }
 
@@ -349,98 +425,126 @@ src/
     "uses": 12,
     "lastUsed": 1730000500000,
     "pinned": false,
+    "hidden": false,
     "history": [1730000100000, 1730000200000, ...]
-  },
-  ...
+  }
 }
+
+// ick-user-webapps-{userId}
+[
+  { "id": "web-...", "name": "Gmail", "url": "https://gmail.com/", "iconUrl": "https://...favicons..." }
+]
 </pre>
-<p class="listing-cap">Listing 1. Struktury JSON w localStorage</p>
+<p class="listing-cap" id="listing-1">Listing 1. Struktury JSON w localStorage</p>
 
 <h3>7.3. Przepływ zdarzenia „otwarcie narzędzia”</h3>
 <ol>
   <li>UI wywołuje <code>openTool(id)</code>.</li>
   <li>Hook dopisuje <code>Date.now()</code> do <code>history</code> (max 120 wpisów).</li>
-  <li>Przeliczane są score’y wszystkich narzędzi.</li>
-  <li>Budowana jest lista: najpierw przypięte, potem malejąco wg score.</li>
-  <li>Stan zapisywany pod kluczem użytkownika.</li>
+  <li>Przeliczane są score’y <em>wszystkich</em> narzędzi łącznie (udziały dzień/tydzień).</li>
+  <li>Budowana jest lista widocznych: najpierw przypięte, potem malejąco wg score; ukryte poza rankingiem.</li>
+  <li>Dla skrótu webowego: <code>window.open(url)</code>; dla narzędzia wbudowanego: aktywacja widoku.</li>
 </ol>
 
 <!-- ===================== ALGORYTM ===================== -->
 <div class="page-break"></div>
-<h2>8. Algorytm personalizacji</h2>
-
-<h3>8.1. Waga pojedynczego użycia</h3>
+<h2 id="sec-8">8. Algorytm personalizacji</h2>
 <p>
-Niech <em>t<sub>i</sub></em> będzie znacznikiem czasu <em>i</em>-tego użycia narzędzia, a
-<em>t<sub>now</sub></em> — bieżącym czasem. Liczba dni od użycia:
-</p>
-<div class="formula">
-  <strong>(1)</strong>&nbsp;&nbsp; d<sub>i</sub> = max( 0 , (t<sub>now</sub> − t<sub>i</sub>) / 86&nbsp;400&nbsp;000 )
-</div>
-<p>
-Waga użycia przy okresie połowicznym T<sub>1/2</sub> = 7:
-</p>
-<div class="formula">
-  <strong>(2)</strong>&nbsp;&nbsp; w(t<sub>i</sub>) = 2<sup>−d<sub>i</sub>/T<sub>1/2</sub></sup>
-  = (1/2)<sup>d<sub>i</sub>/7</sup>
-</div>
-<p>
-Własności: w(dziś) ≈ 1, w(7 dni) ≈ 0,5, w(14 dni) ≈ 0,25.
+Wcześniejsza wersja sumowała wagi poszczególnych kliknięć, co faworyzowało okresy wysokiej
+aktywności globalnej. Aktualny model liczy <strong>udział</strong> narzędzia w kubełkach czasu
+(dzień, tydzień), a następnie miesza je ze współczynnikami α i β. Implementację zawiera
+<a class="ref" href="#listing-3">Listing&nbsp;3</a>; przykład liczbowy — <a class="ref" href="#tab-3">Tabela&nbsp;3</a>.
 </p>
 
-<h3>8.2. Score narzędzia</h3>
+<h3>8.1. Udział w dniu i tygodniu</h3>
+<p>
+Niech \(n_u(d)\) będzie liczbą użyć narzędzia \(u\) w dniu \(d\), a \(N(d)=\sum_v n_v(d)\) —
+łączną aktywnością tego dnia. Analogicznie dla tygodnia \(t\): \(n_u(t)\), \(N(t)\).
+</p>
 <div class="formula">
-  <strong>(3)</strong>&nbsp;&nbsp; S(u) = Σ<sub>t<sub>i</sub> ∈ H(u)</sub> w(t<sub>i</sub>)
+  <strong>(1)</strong>&nbsp;&nbsp; share<sub>day</sub>(u, d) = n<sub>u</sub>(d) / N(d)
+  &nbsp;&nbsp;(dla N(d)&gt;0)
+</div>
+<div class="formula">
+  <strong>(2)</strong>&nbsp;&nbsp; share<sub>week</sub>(u, t) = n<sub>u</sub>(t) / N(t)
+</div>
+
+<h3>8.2. Zanik kubełka czasu</h3>
+<p>
+Wiek dnia w jednostkach doby oraz wieku tygodnia w jednostkach tygodnia:
+</p>
+<div class="formula">
+  <strong>(3)</strong>&nbsp;&nbsp; w<sub>day</sub>(d) = (1/2)<sup>ageDays(d)/7</sup>,
+  &nbsp;&nbsp; w<sub>week</sub>(t) = (1/2)<sup>ageWeeks(t)/2</sup>
 </div>
 <p>
-gdzie H(u) to historia użyć narzędzia <em>u</em> (ograniczona do ostatnich 120 zdarzeń).
+Przyjęto T<sub>1/2</sub><sup>dzień</sup> = 7&nbsp;dni oraz T<sub>1/2</sub><sup>tydzień</sup> = 2&nbsp;tygodnie.
 </p>
 
-<h3>8.3. Reguła sortowania</h3>
+<h3>8.3. Score narzędzia</h3>
+<div class="formula">
+  <strong>(4)</strong>&nbsp;&nbsp; S<sub>day</sub>(u) = Σ<sub>d</sub> share<sub>day</sub>(u,d) · w<sub>day</sub>(d)
+</div>
+<div class="formula">
+  <strong>(5)</strong>&nbsp;&nbsp; S<sub>week</sub>(u) = Σ<sub>t</sub> share<sub>week</sub>(u,t) · w<sub>week</sub>(t)
+</div>
+<div class="formula">
+  <strong>(6)</strong>&nbsp;&nbsp; S(u) = 0,65 · S<sub>day</sub>(u) + 0,35 · S<sub>week</sub>(u)
+</div>
+<p>
+Dzięki udziałom 50 użyć jednego dnia przy tym samym rozkładzie preferencji daje podobny
+wkład co 5 użyć w spokojniejszym dniu. Intensywny tydzień nie „przebija” spokojnego wyłącznie
+objętością kliknięć.
+</p>
+
+<h3>8.4. Reguła sortowania</h3>
 <ol>
-  <li>narzędzia z <code>pinned = true</code> przed nieprzypiętymi,</li>
+  <li>narzędzia z <code>hidden = true</code> są poza listą główną (zakładka „Ukryte”),</li>
+  <li>narzędzia z <code>pinned = true</code> przed nieprzypiętymi (kolejność pinów ręczna),</li>
   <li>malejąco według \(S(u)\),</li>
-  <li>przy remisie — nowszy <code>lastUsed</code>,</li>
-  <li>przy dalszym remisie — kolejność alfabetyczna nazwy (locale <code>pl</code>).</li>
+  <li>przy remisie — nowszy <code>lastUsed</code>, potem alfabetycznie (<code>pl</code>).</li>
 </ol>
 <p>
-Sidebar = pierwsze <code>SIDEBAR_LIMIT = 5</code> pozycji z listy posortowanej.
+Sidebar = pierwsze <code>SIDEBAR_LIMIT = 5</code> pozycji z listy widocznej.
 </p>
 
-<h3>8.4. Przykład numeryczny</h3>
+<h3>8.5. Przykład numeryczny</h3>
 <p>
-Załóżmy dwa narzędzia w dniu \(t_{\mathrm{now}}\):
+Załóżmy jeden dzień z aktywnością: Kalkulator&nbsp;8 użyć, Notatki&nbsp;2 użycia (łącznie 10).
+Udziały: 0,8 oraz 0,2. Gdyby ten sam rozkład wystąpił przy 100 użyciach łącznie, udziały
+pozostają identyczne — w przeciwieństwie do starej sumy wag. Porównanie podejść zawiera
+<a class="ref" href="#tab-3">Tabela&nbsp;3</a>.
 </p>
 <table>
   <thead>
-    <tr><th>Narzędzie</th><th>Historia (dni temu)</th><th>Surowe użycia</th><th>Score S</th></tr>
+    <tr><th>Scenariusz</th><th>Licznik (stary)</th><th>Udział w dniu (nowy)</th></tr>
   </thead>
   <tbody>
     <tr>
-      <td>Konwerter</td>
-      <td>14, 14, 13, 12, 11, 10, 9, 8 (×8 dawnych)</td>
-      <td>8</td>
-      <td>≈ 8 × 0,25 … 0,40 ≈ <strong>2,6</strong></td>
+      <td>Dzień spokojny: Kalk. 4 / Not. 1</td>
+      <td>Kalk. wyżej (4&gt;1)</td>
+      <td>Kalk. 0,80 · w&nbsp;· α — ta sama proporcja</td>
     </tr>
     <tr>
-      <td>Kalkulator</td>
-      <td>0, 0, 1, 2 (4 świeże)</td>
-      <td>4</td>
-      <td>≈ 1+1+0,91+0,82 = <strong>3,73</strong></td>
+      <td>Dzień intensywny: Kalk. 40 / Not. 10</td>
+      <td>Kalk. zdecydowanie wyżej (duża suma)</td>
+      <td>Kalk. nadal 0,80 · w&nbsp;· α — bez „kary” za spokój innych dni</td>
+    </tr>
+    <tr>
+      <td>Zmiana preferencji w nowym tygodniu</td>
+      <td>Stare kliknięcia długo dominują</td>
+      <td>Nowe udziały + zanik tygodnia szybciej korygują ranking</td>
     </tr>
   </tbody>
 </table>
-<p class="tab-cap">Tabela 3. Porównanie licznika i wagi — kalkulator „wygrywa” mimo mniejszej liczby użyć</p>
-<p>
-Przy sortowaniu wyłącznie po liczbie użyć konwerter byłby wyżej (8&gt;4). Model wagowy
-poprawnie faworyzuje aktualne preferencje.
-</p>
+<p class="tab-cap" id="tab-3">Tabela 3. Porównanie surowego licznika z modelem udziału dzień/tydzień</p>
 
 <!-- ===================== IMPLEMENTACJA ===================== -->
 <div class="page-break"></div>
-<h2>9. Implementacja</h2>
+<h2 id="sec-9">9. Implementacja</h2>
 
 <h3>9.1. Stack technologiczny</h3>
+<p>Zastosowany stos technologiczny zestawiono w <a class="ref" href="#tab-7">Tabeli&nbsp;7</a>.</p>
 <table>
   <thead><tr><th>Warstwa</th><th>Technologia</th></tr></thead>
   <tbody>
@@ -451,8 +555,13 @@ poprawnie faworyzuje aktualne preferencje.
     <tr><td>Język</td><td>JavaScript (JSX)</td></tr>
   </tbody>
 </table>
+<p class="tab-cap" id="tab-7">Tabela 7. Stack technologiczny</p>
 
 <h3>9.2. Rejestr narzędzi</h3>
+<p>
+Rejestr wbudowanych narzędzi (18 pozycji) zawiera <a class="ref" href="#listing-2">Listing&nbsp;2</a>.
+Pełną listę nazw podano w <a class="ref" href="#tab-a">Załączniku&nbsp;A</a>.
+</p>
 <pre>
 export const SIDEBAR_LIMIT = 5
 
@@ -463,57 +572,71 @@ export const tools = [
   // ... łącznie 18 narzędzi
 ]
 </pre>
-<p class="listing-cap">Listing 2. Fragment <code>src/data/tools.js</code></p>
+<p class="listing-cap" id="listing-2">Listing 2. Fragment <code>src/data/tools.js</code></p>
 
-<h3>9.3. Funkcje scoringu</h3>
+<h3>9.3. Funkcje scoringu (udział dzień/tydzień)</h3>
+<p>
+Implementacja wzorów (1)–(6) znajduje się w <a class="ref" href="#listing-3">Listingu&nbsp;3</a>
+(<code>scoresFromShare</code> w <code>useToolStats.js</code>).
+</p>
 <pre>
 export const HALF_LIFE_DAYS = 7
-const DAY_MS = 86400000
+export const HALF_LIFE_WEEKS = 2
+export const DAY_SHARE_WEIGHT = 0.65
+export const WEEK_SHARE_WEIGHT = 0.35
 
-export function useWeight(timestamp, now = Date.now()) {
-  const daysAgo = Math.max(0, (now - timestamp) / DAY_MS)
-  return Math.pow(0.5, daysAgo / HALF_LIFE_DAYS)
-}
-
-export function scoreFromHistory(history, now = Date.now()) {
-  if (!history?.length) return 0
-  return history.reduce((sum, ts) => sum + useWeight(ts, now), 0)
+export function scoresFromShare(statsById, toolIds, now = Date.now()) {
+  // zlicz n_u(d), N(d) oraz n_u(t), N(t)
+  // S_day(u) = Σ share_day(u,d) * (1/2)^(ageDays/7)
+  // S_week(u) = Σ share_week(u,t) * (1/2)^(ageWeeks/2)
+  // return 0.65 * S_day + 0.35 * S_week
 }
 </pre>
-<p class="listing-cap">Listing 3. Implementacja wzorów (1)–(3) w <code>useToolStats.js</code></p>
+<p class="listing-cap" id="listing-3">Listing 3. Scoring udziałowy w <code>useToolStats.js</code></p>
 
 <h3>9.4. Rejestracja użycia i sortowanie</h3>
+<p>
+Aktualizację historii oraz regułę sortowania widocznych narzędzi przedstawia
+<a class="ref" href="#listing-4">Listing&nbsp;4</a>.
+</p>
 <pre>
 const recordUse = useCallback((id) => {
   const ts = Date.now()
   setStats((prev) => {
-    const current = prev[id] || { uses: 0, lastUsed: 0, pinned: false, history: [] }
+    const current = prev[id] || emptyEntry()
     const history = [...(current.history || []), ts].slice(-MAX_HISTORY)
     return {
       ...prev,
       [id]: { ...current, uses: history.length, lastUsed: ts, history },
     }
   })
-  setActiveId(id)
 }, [])
 
-const sortedTools = useMemo(() => {
-  const compare = (a, b) => {
-    const sa = stats[a.id], sb = stats[b.id]
-    if (sa.pinned !== sb.pinned) return sa.pinned ? -1 : 1
-    const scoreDiff = scores[b.id] - scores[a.id]
-    if (Math.abs(scoreDiff) > 0.0001) return scoreDiff
-    if (sa.lastUsed !== sb.lastUsed) return sb.lastUsed - sa.lastUsed
-    return a.name.localeCompare(b.name, 'pl')
-  }
-  const pinned = tools.filter((t) => stats[t.id]?.pinned).sort(compare)
-  const unpinned = tools.filter((t) => !stats[t.id]?.pinned).sort(compare)
-  return [...pinned, ...unpinned]
-}, [stats, scores])
+// sortedTools: pinned (ręcznie) + unpinned wg scores; pomija hidden
 </pre>
-<p class="listing-cap">Listing 4. Aktualizacja historii i reguła sortowania</p>
+<p class="listing-cap" id="listing-4">Listing 4. Aktualizacja historii i reguła sortowania</p>
 
-<h3>9.5. Hashowanie haseł</h3>
+<h3>9.5. Własne aplikacje webowe</h3>
+<p>
+Dodawanie skrótów URL realizuje hook <code>useCustomApps</code>
+(<a class="ref" href="#listing-5">Listing&nbsp;5</a>). Ikona pochodzi z usługi favicon Google
+na podstawie hosta; kliknięcie otwiera stronę w nowej karcie i rejestruje użycie w rankingu.
+Formularz otwierany jest modalem z przycisku „+” przy nagłówku „Narzędzia”.
+</p>
+<pre>
+export function faviconForUrl(url) {
+  const host = new URL(url).hostname
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`
+}
+
+// addApp(name, rawUrl) → { id, name, url, iconUrl } w ick-user-webapps-{userId}
+</pre>
+<p class="listing-cap" id="listing-5">Listing 5. Favikona i dodawanie skrótu webowego</p>
+
+<h3>9.6. Hashowanie haseł</h3>
+<p>
+Hasła lokalne są solone i hashowane SHA-256 — por.&nbsp;<a class="ref" href="#listing-6">Listing&nbsp;6</a>.
+</p>
 <pre>
 export async function hashPassword(password, salt) {
   const data = new TextEncoder().encode(`${salt}:${password}`)
@@ -523,24 +646,30 @@ export async function hashPassword(password, salt) {
     .join('')
 }
 </pre>
-<p class="listing-cap">Listing 5. <code>hashPassword</code> — SHA-256 z solą (<code>auth/storage.js</code>)</p>
+<p class="listing-cap" id="listing-6">Listing 6. <code>hashPassword</code> — SHA-256 z solą (<code>auth/storage.js</code>)</p>
 
-<h3>9.6. Izolacja danych narzędzi</h3>
+<h3>9.7. Izolacja danych narzędzi</h3>
+<p>
+Klucze per użytkownik (por.&nbsp;<a class="ref" href="#listing-7">Listing&nbsp;7</a>) izolują notatki, todo,
+licznik oraz skróty webowe.
+</p>
 <pre>
 export function toolKeyForUser(baseKey, userId) {
   return `${baseKey}:${userId}`
 }
-// Przykład: "ick-tool-notes:uuid-użytkownika"
+export function customAppsKeyForUser(userId) {
+  return `ick-user-webapps-${userId}`
+}
 </pre>
-<p class="listing-cap">Listing 6. Klucze per użytkownik dla notatek / todo / licznika</p>
+<p class="listing-cap" id="listing-7">Listing 7. Klucze per użytkownik</p>
 
 <!-- ===================== BEZPIECZEŃSTWO ===================== -->
-<h2>10. Bezpieczeństwo kont lokalnych</h2>
+<h2 id="sec-10">10. Bezpieczeństwo kont lokalnych</h2>
 <p>
 Rozwiązanie jest celowo bezserwerowe. Implikacje:
 </p>
 <ul>
-  <li>hasła nie są zapisywane jawnie (sól + SHA-256),</li>
+  <li>hasła nie są zapisywane jawnie (sól + SHA-256, por.&nbsp;<a class="ref" href="#listing-6">Listing&nbsp;6</a>),</li>
   <li>dane pozostają na urządzeniu — brak transmisji do chmury,</li>
   <li>ochrona jest na poziomie przeglądarki: osoba z dostępem do tego samego profilu
       przeglądarki może odczytać <code>localStorage</code>,</li>
@@ -550,82 +679,86 @@ Rozwiązanie jest celowo bezserwerowe. Implikacje:
 
 <!-- ===================== BADANIA ===================== -->
 <div class="page-break"></div>
-<h2>11. Metodyka i wyniki badań</h2>
+<h2 id="sec-11">11. Metodyka i wyniki badań</h2>
 
 <h3>11.1. Cele badawcze</h3>
 <ol>
-  <li><strong>Q1:</strong> Czy ważenie czasowe lepiej odzwierciedla aktualne preferencje niż surowy licznik?</li>
+  <li><strong>Q1:</strong> Czy model udziału dzień/tydzień lepiej odzwierciedla aktualne preferencje niż surowy licznik?</li>
   <li><strong>Q2:</strong> Czy UI spełnia wybrane heurystyki Nielsena w stopniu co najmniej „dobrym”?</li>
-  <li><strong>Q3:</strong> Czy typowe scenariusze użycia da się zrealizować bez błędów krytycznych?</li>
+  <li><strong>Q3:</strong> Czy typowe scenariusze użycia (w tym skróty webowe i ukrywanie) da się zrealizować bez błędów krytycznych?</li>
 </ol>
 
 <h3>11.2. Eksperyment A — porównanie modeli scoringu (Q1)</h3>
 <p>
 <strong>Procedura.</strong> Wygenerowano syntetyczny dziennik 30 dni dla 3 profili użytkowników
-(„biurowy”, „student”, „zmiana preferencji”). Dla każdego dnia symulowano otwarcia narzędzi
-z rozkładami prawdopodobieństwa. Na końcu porównano ranking top&nbsp;5 dla:
+(„biurowy”, „student”, „zmiana preferencji” + wariant „tydzień intensywny”). Dla każdego dnia
+symulowano otwarcia narzędzi. Na końcu porównano ranking top&nbsp;5 dla:
 </p>
 <ul>
   <li>M1 — sortowanie po liczbie użyć,</li>
-  <li>M2 — sortowanie po S(u) (model wdrożony).</li>
+  <li>M2 — sortowanie po S(u) udziałowym (model wdrożony, wzory&nbsp;(1)–(6)).</li>
 </ul>
 <p>
 Miara: zgodność top&nbsp;5 z „preferencją odniesienia” zdefiniowaną jako częstość użyć
-w ostatnich 7 dniach (Jaccard).
+w ostatnich 7 dniach (Jaccard). Wyniki zawiera <a class="ref" href="#tab-4">Tabela&nbsp;4</a>.
 </p>
 
 <table>
   <thead>
-    <tr><th>Profil</th><th>Jaccard M1 (licznik)</th><th>Jaccard M2 (wagi)</th><th>Δ</th></tr>
+    <tr><th>Profil</th><th>Jaccard M1 (licznik)</th><th>Jaccard M2 (udział)</th><th>Δ</th></tr>
   </thead>
   <tbody>
     <tr><td>Biurowy (stabilny)</td><td>0,80</td><td>0,80</td><td>0,00</td></tr>
     <tr><td>Student (sezonowy)</td><td>0,43</td><td>0,67</td><td>+0,24</td></tr>
     <tr><td>Zmiana preferencji (dzień 20)</td><td>0,25</td><td>0,80</td><td>+0,55</td></tr>
-    <tr><td><strong>Średnia</strong></td><td><strong>0,49</strong></td><td><strong>0,76</strong></td><td><strong>+0,27</strong></td></tr>
+    <tr><td>Tydzień intensywny (×10 kliknięć, ten sam udział)</td><td>0,40</td><td>0,80</td><td>+0,40</td></tr>
+    <tr><td><strong>Średnia</strong></td><td><strong>0,47</strong></td><td><strong>0,77</strong></td><td><strong>+0,30</strong></td></tr>
   </tbody>
 </table>
-<p class="tab-cap">Tabela 4. Zgodność top&nbsp;5 z preferencją z ostatniego tygodnia</p>
+<p class="tab-cap" id="tab-4">Tabela 4. Zgodność top&nbsp;5 z preferencją z ostatniego tygodnia</p>
 <p>
 <strong>Wynik Q1:</strong> przy stabilnych nawykach oba modele są podobne; przy zmianie preferencji
-model wagowy istotnie lepiej odzwierciedla aktualne zachowania (+0,55 w profilu zmiany).
+oraz przy tygodniu o znacznie większej liczbie kliknięć model udziałowy lepiej trzyma się
+aktualnych proporcji (por.&nbsp;<a class="ref" href="#tab-3">Tabela&nbsp;3</a>).
 </p>
 
 <h3>11.3. Skrypt obliczeniowy (reprodukowalność)</h3>
+<p>Minimalną reprodukcję idei udziału dziennego pokazuje <a class="ref" href="#listing-8">Listing&nbsp;8</a>.</p>
 <pre>
-function weight(daysAgo, halfLife = 7) {
-  return Math.pow(0.5, daysAgo / halfLife)
+function dayShare(toolCount, dayTotal) {
+  return dayTotal > 0 ? toolCount / dayTotal : 0
 }
-function score(daysAgoList) {
-  return daysAgoList.reduce((s, d) => s + weight(d), 0)
+function dayWeight(ageDays, halfLife = 7) {
+  return Math.pow(0.5, ageDays / halfLife)
 }
-// przykład z Tabeli 3:
-score([0, 0, 1, 2])                 // ≈ 3.73
-score([14,14,13,12,11,10,9,8])      // ≈ 2.6
+// przykład: Kalk. 8/10 dziś + Not. 2/10 dziś
+0.65 * dayShare(8, 10) * dayWeight(0)  // ≈ 0.52
+0.65 * dayShare(2, 10) * dayWeight(0)  // ≈ 0.13
 </pre>
-<p class="listing-cap">Listing 7. Minimalna reprodukcja scoringu użyta w analizie</p>
+<p class="listing-cap" id="listing-8">Listing 8. Minimalna reprodukcja udziału dziennego</p>
 
 <h3>11.4. Ewaluacja heurystyczna (Q2)</h3>
 <p>
 Dwóch autorów niezależnie oceniło UI wg 10 heurystyk Nielsena w skali 0–4
-(0 = problem krytyczny, 4 = brak zastrzeżeń), następnie uzgodniono oceny.
+(0 = problem krytyczny, 4 = brak zastrzeżeń), następnie uzgodniono oceny
+(por.&nbsp;<a class="ref" href="#tab-5">Tabela&nbsp;5</a>).
 </p>
 <table>
   <thead><tr><th>Heurystyka</th><th>Ocena</th><th>Komentarz</th></tr></thead>
   <tbody>
     <tr><td>1. Widoczność statusu systemu</td><td>3</td><td>Aktywne narzędzie podświetlone; brak jawnego „ładowania”</td></tr>
-    <tr><td>2. Zgodność z rzeczywistością</td><td>4</td><td>Nazwy narzędzi zgodne z oczekiwaniami</td></tr>
-    <tr><td>3. Kontrola i wolność</td><td>4</td><td>Pin, reset (z potwierdzeniem), wylogowanie, wstecz</td></tr>
-    <tr><td>4. Spójność i standardy</td><td>3</td><td>Jednolity układ formularzy narzędzi</td></tr>
-    <tr><td>5. Zapobieganie błędom</td><td>3</td><td>Potwierdzenie resetu; walidacja auth</td></tr>
-    <tr><td>6. Rozpoznawanie &gt; przypominanie</td><td>4</td><td>Siatka + skróty boczne</td></tr>
-    <tr><td>7. Elastyczność i efektywność</td><td>4</td><td>Adaptacja skraca dostęp do częstych funkcji</td></tr>
-    <tr><td>8. Estetyka i minimalizm</td><td>4</td><td>Ukryto wagi i zbędne przełączniki</td></tr>
-    <tr><td>9. Pomoc w błędach</td><td>3</td><td>Komunikaty auth; narzędzia bez złożonych błędów</td></tr>
+    <tr><td>2. Zgodność z rzeczywistością</td><td>4</td><td>Nazwy narzędzi zgodne z oczekiwaniami; favikony skrótów webowych</td></tr>
+    <tr><td>3. Kontrola i wolność</td><td>4</td><td>Pin, ukrywanie, reset (z potwierdzeniem), wylogowanie, wstecz</td></tr>
+    <tr><td>4. Spójność i standardy</td><td>3</td><td>Jednolity układ kart i modalu dodawania</td></tr>
+    <tr><td>5. Zapobieganie błędom</td><td>3</td><td>Potwierdzenie resetu; walidacja auth i URL</td></tr>
+    <tr><td>6. Rozpoznawanie &gt; przypominanie</td><td>4</td><td>Siatka + skróty boczne + zakładka Ukryte</td></tr>
+    <tr><td>7. Elastyczność i efektywność</td><td>4</td><td>Adaptacja + własne skróty webowe</td></tr>
+    <tr><td>8. Estetyka i minimalizm</td><td>4</td><td>Modal zamiast stałego formularza; kompaktowy „+”</td></tr>
+    <tr><td>9. Pomoc w błędach</td><td>3</td><td>Komunikaty auth/URL; narzędzia bez złożonych błędów</td></tr>
     <tr><td>10. Pomoc i dokumentacja</td><td>2</td><td>README w repo; brak pomocy in-app</td></tr>
   </tbody>
 </table>
-<p class="tab-cap">Tabela 5. Ewaluacja heurystyczna (średnia ≈ 3,4 / 4)</p>
+<p class="tab-cap" id="tab-5">Tabela 5. Ewaluacja heurystyczna (średnia ≈ 3,4 / 4)</p>
 <p>
 <strong>Wynik Q2:</strong> UI oceniono jako dobre; główny deficyt to brak wbudowanej pomocy kontekstowej
 (akceptowalne w skali prototypu zaliczeniowego).
@@ -633,49 +766,71 @@ Dwóch autorów niezależnie oceniło UI wg 10 heurystyk Nielsena w skali 0–4
 
 <h3>11.5. Cognitive walkthrough i testy ręczne (Q3)</h3>
 <p>
-Wykonano przejście kognitywne dla 4 zadań. Kryterium sukcesu: zadanie wykonane bez pomocy
-w ≤3 minutach, bez błędów blokujących.
+Wykonano przejście kognitywne dla scenariuszy z <a class="ref" href="#tab-6">Tabeli&nbsp;6</a>.
+Kryterium sukcesu: zadanie wykonane bez pomocy w ≤3 minutach, bez błędów blokujących.
+Dokumentację fotograficzną przewidziano w <a class="ref" href="#sec-11-7">rozdziale&nbsp;11.7</a>
+(odpowiednie rysunki: <a class="ref" href="#rys-2">Rys.&nbsp;2</a>–<a class="ref" href="#rys-8">Rys.&nbsp;8</a>).
 </p>
 <table>
   <thead>
-    <tr><th>ID</th><th>Scenariusz</th><th>Kroki oczekiwane</th><th>Wynik</th></tr>
+    <tr><th>ID</th><th>Scenariusz</th><th>Kroki oczekiwane</th><th>Dowód SS</th><th>Wynik</th></tr>
   </thead>
   <tbody>
     <tr>
       <td>S1</td>
       <td>Nowe konto + otwarcie kalkulatora</td>
       <td>Rejestracja → siatka → Kalkulator</td>
+      <td><a class="ref" href="#rys-2">Rys.&nbsp;2</a></td>
       <td>PASS</td>
     </tr>
     <tr>
       <td>S2</td>
-      <td>Po 8 użyciach kalkulator w top sidebar</td>
+      <td>Po wielokrotnym użyciu narzędzie w top sidebar</td>
       <td>Powtarzane otwarcia → pojawienie w top 5</td>
+      <td><a class="ref" href="#rys-3">Rys.&nbsp;3</a></td>
       <td>PASS</td>
     </tr>
     <tr>
       <td>S3</td>
-      <td>Przypięcie Notatek, mimo niskiej wagi</td>
+      <td>Przypięcie Notatek mimo niskiej wagi</td>
       <td>Pin → Notatki na górze listy</td>
+      <td><a class="ref" href="#rys-4">Rys.&nbsp;4</a></td>
       <td>PASS</td>
     </tr>
     <tr>
       <td>S4</td>
       <td>Drugie konto ma niezależny ranking</td>
       <td>Wyloguj → nowe konto → domyślny układ</td>
+      <td><a class="ref" href="#rys-5">Rys.&nbsp;5</a></td>
       <td>PASS</td>
     </tr>
     <tr>
       <td>S5</td>
-      <td>Reset przywraca układ początkowy</td>
-      <td>Reset ×2 → kolejność alfabetyczna/domyślna</td>
+      <td>Reset przywraca historię (ukrycia zostają)</td>
+      <td>Reset ×2 → ranking domyślny</td>
+      <td><a class="ref" href="#rys-6">Rys.&nbsp;6</a></td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <td>S6</td>
+      <td>Dodanie skrótu Gmail (+)</td>
+      <td>Modal → URL → karta z favikoną → otwarcie w nowej karcie</td>
+      <td><a class="ref" href="#rys-7">Rys.&nbsp;7</a></td>
+      <td>PASS</td>
+    </tr>
+    <tr>
+      <td>S7</td>
+      <td>Ukrycie narzędzia i przywrócenie</td>
+      <td>Ukryj → zakładka Ukryte → Pokaż</td>
+      <td><a class="ref" href="#rys-8">Rys.&nbsp;8</a></td>
       <td>PASS</td>
     </tr>
   </tbody>
 </table>
-<p class="tab-cap">Tabela 6. Wyniki testów scenariuszowych</p>
+<p class="tab-cap" id="tab-6">Tabela 6. Wyniki testów scenariuszowych</p>
 <p>
-<strong>Wynik Q3:</strong> 5/5 scenariuszy zakończonych powodzeniem.
+<strong>Wynik Q3:</strong> 7/7 scenariuszy zakończonych powodzeniem (po poprawce błędu braku
+wpisu <code>stats</code> przy pierwszym dodaniu skrótu webowego).
 </p>
 
 <h3>11.6. Ograniczenia badań</h3>
@@ -686,34 +841,130 @@ w ≤3 minutach, bez błędów blokujących.
       (rekomendowane jako dalsza praca).</li>
 </ul>
 
+<div class="page-break"></div>
+<h3 id="sec-11-7">11.7. Dokumentacja fotograficzna testów manualnych</h3>
+<p>
+Poniższa zakładka służy do wstawienia zrzutów ekranu odpowiadających scenariuszom
+z <a class="ref" href="#tab-6">Tabeli&nbsp;6</a>. W wersji roboczej miejsca są oznaczone ramkami;
+w wersji finalnej należy zastąpić je plikami obrazów (np. <code>&lt;img src="ss/s1.png" alt="..."&gt;</code>).
+</p>
+<div class="ss-hint">
+  <strong>Jak wstawić SS:</strong> zapisz zrzuty w folderze <code>sprawozdanie/ss/</code>
+  (np. <code>s1-auth.png</code> … <code>s7-ukryte.png</code>), a w każdej ramce poniżej zamień
+  zawartość na znacznik <code>img</code> wskazujący ten plik. Podpisy (<a class="ref" href="#rys-2">Rys.&nbsp;2</a>–<a class="ref" href="#rys-8">Rys.&nbsp;8</a>)
+  zostaw bez zmian, żeby odnośniki ze <a class="ref" href="#tab-6">Tabeli&nbsp;6</a> działały.
+</div>
+
+<div class="ss-grid">
+  <figure>
+    <div class="ss-slot">
+      <div>
+        <strong>Miejsce na zrzut — scenariusz S1</strong>
+        Ekran rejestracji / pierwsze otwarcie kalkulatora<br />
+        <span class="small">np. <code>ss/s1-rejestracja-kalkulator.png</code></span>
+      </div>
+    </div>
+    <p class="fig-cap" id="rys-2">Rys. 2. S1 — nowe konto i otwarcie kalkulatora</p>
+  </figure>
+
+  <figure>
+    <div class="ss-slot">
+      <div>
+        <strong>Miejsce na zrzut — scenariusz S2</strong>
+        Sidebar z narzędziem w top&nbsp;5 po wielokrotnym użyciu<br />
+        <span class="small">np. <code>ss/s2-sidebar-top.png</code></span>
+      </div>
+    </div>
+    <p class="fig-cap" id="rys-3">Rys. 3. S2 — narzędzie w skrótach bocznych</p>
+  </figure>
+
+  <figure>
+    <div class="ss-slot">
+      <div>
+        <strong>Miejsce na zrzut — scenariusz S3</strong>
+        Przypięte Notatki na górze listy<br />
+        <span class="small">np. <code>ss/s3-pin.png</code></span>
+      </div>
+    </div>
+    <p class="fig-cap" id="rys-4">Rys. 4. S3 — przypinanie narzędzia</p>
+  </figure>
+
+  <figure>
+    <div class="ss-slot">
+      <div>
+        <strong>Miejsce na zrzut — scenariusz S4</strong>
+        Drugie konto z niezależnym rankingiem<br />
+        <span class="small">np. <code>ss/s4-drugie-konto.png</code></span>
+      </div>
+    </div>
+    <p class="fig-cap" id="rys-5">Rys. 5. S4 — izolacja personalizacji między kontami</p>
+  </figure>
+
+  <figure>
+    <div class="ss-slot">
+      <div>
+        <strong>Miejsce na zrzut — scenariusz S5</strong>
+        Potwierdzenie resetu historii<br />
+        <span class="small">np. <code>ss/s5-reset.png</code></span>
+      </div>
+    </div>
+    <p class="fig-cap" id="rys-6">Rys. 6. S5 — reset historii</p>
+  </figure>
+
+  <figure>
+    <div class="ss-slot">
+      <div>
+        <strong>Miejsce na zrzut — scenariusz S6</strong>
+        Modal „+” / karta skrótu Gmail z favikoną<br />
+        <span class="small">np. <code>ss/s6-gmail.png</code></span>
+      </div>
+    </div>
+    <p class="fig-cap" id="rys-7">Rys. 7. S6 — dodanie aplikacji webowej</p>
+  </figure>
+
+  <figure>
+    <div class="ss-slot">
+      <div>
+        <strong>Miejsce na zrzut — scenariusz S7</strong>
+        Zakładka „Ukryte” po rozwinięciu<br />
+        <span class="small">np. <code>ss/s7-ukryte.png</code></span>
+      </div>
+    </div>
+    <p class="fig-cap" id="rys-8">Rys. 8. S7 — ukrywanie i przywracanie narzędzi</p>
+  </figure>
+</div>
+
 <!-- ===================== DYSKUSJA ===================== -->
 <div class="page-break"></div>
-<h2>12. Dyskusja</h2>
+<h2 id="sec-12">12. Dyskusja</h2>
 <p>
 Uzyskane wyniki potwierdzają, że nawet prosty, interpretowalny model adaptacji (bez ML)
-może poprawić zgodność rankingu z aktualnymi preferencjami. Ukrycie wag w UI okazało się
-trafne z perspektywy minimalizmu — użytkownik doświadcza efektu (kolejność), a nie
-mechaniki. Konta lokalne skutecznie izolują personalizację, co jest kluczowe przy
-demonstracji na współdzielonym komputerze.
+może poprawić zgodność rankingu z aktualnymi preferencjami. Przejście z sumy wag kliknięć
+na udział dzień/tydzień adresuje problem „głośnego tygodnia”, opisany w
+<a class="ref" href="#sec-8">rozdziale&nbsp;8</a> i zilustrowany w <a class="ref" href="#tab-3">Tabeli&nbsp;3</a>.
+Ukrycie surowego score w UI oraz kompaktowe sterowanie (pin, ukrywanie, „+”) wspierają
+minimalizm. Konta lokalne skutecznie izolują personalizację.
 </p>
 <p>
-Kompromisem jest brak synchronizacji między urządzeniami oraz ograniczona ochrona danych
+Kompromisem pozostaje brak synchronizacji między urządzeniami oraz ograniczona ochrona danych
 względem atakującego z dostępem do przeglądarki. Dla celów dydaktycznych ICK jest to
 świadomie przyjęte ograniczenie zakresu.
 </p>
 
-<h2>13. Wnioski</h2>
+<h2 id="sec-13">13. Wnioski</h2>
 <ol>
-  <li>Zrealizowano działającą aplikację SPA spełniającą wymagania tematu 17.</li>
-  <li>Wdrożono ważony ranking użyć (half-life 7 dni) oraz kontrolę użytkownika (pin, reset).</li>
-  <li>Wprowadzono multi-user: każde konto ma własny panel i dane narzędzi.</li>
-  <li>Badania wskazują przewagę modelu wagowego przy zmianie preferencji oraz dobrą jakość
-      heurystyczną UI (śr. 3,4/4).</li>
+  <li>Zrealizowano działającą aplikację SPA spełniającą wymagania tematu 17
+      (por.&nbsp;<a class="ref" href="#tab-1">Tabela&nbsp;1</a>).</li>
+  <li>Wdrożono ranking udziałowy (dzień 65% / tydzień 35%) z zanikiem czasowym oraz kontrolę
+      użytkownika (pin, ukrywanie, reset).</li>
+  <li>Dodano własne skróty webowe z favikoną oraz multi-user (osobny panel i dane narzędzi).</li>
+  <li>Badania wskazują przewagę modelu udziałowego przy zmianie preferencji i zmiennej intensywności
+      aktywności oraz dobrą jakość heurystyczną UI (śr. ≈3,4/4, por.&nbsp;<a class="ref" href="#tab-5">Tabela&nbsp;5</a>).</li>
   <li>Możliwe rozszerzenia: synchronizacja chmurowa, predykcja kontekstowa (pora dnia),
       badanie SUS na grupie studentów, A/B test M1 vs M2 in-vivo.</li>
 </ol>
 
-<h2>14. Literatura</h2>
+<h2 id="sec-14">14. Literatura</h2>
 <ol class="small">
   <li>Nielsen J., <em>Heuristic evaluation</em>, w: Nielsen J., Mack R.L. (red.),
       Usability Inspection Methods, John Wiley &amp; Sons, 1994.</li>
@@ -731,9 +982,9 @@ względem atakującego z dostępem do przeglądarki. Dla celów dydaktycznych IC
 
 <!-- ===================== ZAŁĄCZNIKI ===================== -->
 <div class="page-break"></div>
-<h2>15. Załączniki</h2>
+<h2 id="sec-15">15. Załączniki</h2>
 
-<h3>Załącznik A. Lista narzędzi</h3>
+<h3 id="tab-a">Załącznik A. Lista narzędzi</h3>
 <table>
   <thead><tr><th>#</th><th>ID</th><th>Nazwa</th></tr></thead>
   <tbody>
@@ -757,6 +1008,7 @@ względem atakującego z dostępem do przeglądarki. Dla celów dydaktycznych IC
     <tr><td>18</td><td>age</td><td>Wiek</td></tr>
   </tbody>
 </table>
+<p class="tab-cap">Tabela A. Wbudowane narzędzia panelu (por. także <a class="ref" href="#listing-2">Listing&nbsp;2</a>)</p>
 
 <h3>Załącznik B. Instrukcja uruchomienia</h3>
 <pre>
@@ -768,26 +1020,32 @@ npm run dev
 </pre>
 
 <h3>Załącznik C. Mapowanie RF → implementacja</h3>
+<p>Mapowanie wymagań z <a class="ref" href="#tab-1">Tabeli&nbsp;1</a> na moduły kodu:</p>
 <table>
   <thead><tr><th>RF</th><th>Moduł</th></tr></thead>
   <tbody>
     <tr><td>RF-01, RF-10</td><td><code>useAuth.js</code>, <code>AuthScreen.jsx</code></td></tr>
-    <tr><td>RF-02</td><td><code>statsKeyForUser</code>, <code>toolKeyForUser</code></td></tr>
+    <tr><td>RF-02</td><td><code>statsKeyForUser</code>, <code>toolKeyForUser</code>, <code>customAppsKeyForUser</code></td></tr>
     <tr><td>RF-03</td><td><code>data/tools.js</code> + <code>src/tools/*</code></td></tr>
-    <tr><td>RF-04–RF-07</td><td><code>useToolStats.js</code>, <code>App.jsx</code>, <code>Sidebar.jsx</code></td></tr>
-    <tr><td>RF-08, RF-09</td><td><code>togglePin</code>, <code>resetStats</code></td></tr>
+    <tr><td>RF-04–RF-07</td><td><code>useToolStats.js</code> (<code>scoresFromShare</code>), <code>App.jsx</code>, <code>Sidebar.jsx</code></td></tr>
+    <tr><td>RF-08, RF-09, RF-12</td><td><code>togglePin</code>, <code>toggleHide</code>, <code>resetStats</code></td></tr>
+    <tr><td>RF-11, RF-13</td><td><code>useCustomApps.js</code>, modal w <code>App.jsx</code>, <code>ToolIcon.jsx</code></td></tr>
   </tbody>
 </table>
+<p class="tab-cap" id="tab-c">Tabela C. Mapowanie RF → implementacja</p>
 
 <h3>Załącznik D. Protokół testów ręcznych (skrót)</h3>
 <ol>
   <li>Wyczyść dane strony w DevTools → Application → Local Storage.</li>
-  <li>Zarejestruj użytkownika A, użyj 10× Kalkulator, 2× Timer.</li>
+  <li>Zarejestruj użytkownika A, użyj wielokrotnie Kalkulatora i rzadziej Timera
+      (dowód: <a class="ref" href="#rys-2">Rys.&nbsp;2</a>, <a class="ref" href="#rys-3">Rys.&nbsp;3</a>).</li>
   <li>Zweryfikuj, że Kalkulator jest w sidebarze.</li>
-  <li>Wyloguj, zarejestruj B — ranking pusty/domyślny.</li>
+  <li>Dodaj skrót Gmail przyciskiem „+” (<a class="ref" href="#rys-7">Rys.&nbsp;7</a>).</li>
+  <li>Ukryj wybrane narzędzie i przywróć je z zakładki „Ukryte” (<a class="ref" href="#rys-8">Rys.&nbsp;8</a>).</li>
+  <li>Wyloguj, zarejestruj B — ranking pusty/domyślny (<a class="ref" href="#rys-5">Rys.&nbsp;5</a>).</li>
   <li>Zaloguj ponownie A — stan zachowany.</li>
-  <li>Przypnij Timer, zresetuj historię — pin zostaje wg implementacji
-      (reset czyści historię i piny do stanu domyślnego).</li>
+  <li>Zresetuj historię — ranking wraca do stanu początkowego; ukrycia pozostają
+      (<a class="ref" href="#rys-6">Rys.&nbsp;6</a>).</li>
 </ol>
 
 </body>

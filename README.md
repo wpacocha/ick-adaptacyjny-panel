@@ -21,7 +21,7 @@ npm run dev
 - lokalne konta użytkowników (rejestracja / logowanie / wylogowanie)
 - osobny panel i historia dla każdego konta
 - 18 prostych narzędzi
-- wagi czasowe użyć (zanik wykładniczy, półokres 7 dni)
+- ranking według udziału w aktywności dnia i tygodnia (nie surowej liczby kliknięć), z zanikiem w czasie
 - skróty top 5 w lewym panelu
 - przypinanie narzędzi i reset historii
 - tryb „Dlaczego tak?” oraz powiększanie popularnych przycisków

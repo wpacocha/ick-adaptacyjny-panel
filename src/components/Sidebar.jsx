@@ -1,3 +1,5 @@
+import ToolIcon from './ToolIcon'
+
 export default function Sidebar({
   user,
   sidebarTools,
@@ -36,6 +38,7 @@ export default function Sidebar({
         <div className="nav-list">
           {sidebarTools.map((tool) => {
             const s = stats[tool.id]
+            const pinned = Boolean(s?.pinned)
             const isActive = activeId === tool.id
             const pinnedIndex = pinnedInSidebar.findIndex((t) => t.id === tool.id)
 
@@ -48,14 +51,14 @@ export default function Sidebar({
                   title={tool.name}
                 >
                   <span className="nav-icon" aria-hidden>
-                    {tool.icon}
+                    <ToolIcon tool={tool} />
                   </span>
                   <span className="nav-text">
                     <span className="nav-name">{tool.name}</span>
                   </span>
                 </button>
                 <div className="nav-actions">
-                  {s.pinned && (
+                  {pinned && (
                     <div className="pin-order-btns">
                       <button
                         type="button"
@@ -81,10 +84,10 @@ export default function Sidebar({
                   )}
                   <button
                     type="button"
-                    className={`pin-btn${s.pinned ? ' pinned' : ''}`}
+                    className={`pin-btn${pinned ? ' pinned' : ''}`}
                     onClick={() => onTogglePin(tool.id)}
-                    title={s.pinned ? 'Odepnij' : 'Przypnij'}
-                    aria-label={s.pinned ? 'Odepnij' : 'Przypnij'}
+                    title={pinned ? 'Odepnij' : 'Przypnij'}
+                    aria-label={pinned ? 'Odepnij' : 'Przypnij'}
                   >
                     📌
                   </button>

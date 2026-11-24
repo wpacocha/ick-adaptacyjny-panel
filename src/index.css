@@ -305,6 +305,9 @@ button {
 
 .nav-icon {
   width: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   font-size: 1.05rem;
 }
@@ -412,6 +415,37 @@ button {
   height: 100%;
 }
 
+.tools-home-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.add-app-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--accent-ink);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.add-app-btn:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, white);
+  background: var(--accent-soft);
+}
+
+.add-app-btn:active {
+  transform: translateY(1px);
+}
+
 .tools-home-bar {
   display: flex;
   align-items: center;
@@ -509,12 +543,193 @@ button {
   text-align: left;
 }
 
-.welcome-card span {
+.welcome-card .card-icon {
   font-size: 1.4rem;
+  line-height: 1;
 }
 
 .welcome-card strong {
   font-family: var(--font-display);
+}
+
+.welcome-card .card-url {
+  font-size: 0.78rem;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.tool-favicon {
+  width: 1.35rem;
+  height: 1.35rem;
+  object-fit: contain;
+  border-radius: 4px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.nav-icon .tool-favicon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.workspace-icon .tool-favicon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.webapp-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.webapp-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+.icon-btn.tiny.danger {
+  color: var(--danger);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.icon-btn.tiny.hide-btn {
+  opacity: 0.55;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-card:hover .icon-btn.tiny.hide-btn,
+.icon-btn.tiny.hide-btn.active {
+  opacity: 1;
+  color: var(--ink);
+}
+
+.welcome-card.is-hidden {
+  opacity: 0.72;
+  background: linear-gradient(180deg, #f4f6f5, #e8eeeb);
+}
+
+.welcome-card.is-hidden .welcome-card-main:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+
+.hidden-fold {
+  margin-top: 0.2rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--line);
+  gap: 0.75rem;
+}
+
+.fold-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: none;
+  background: transparent;
+  padding: 0.15rem 0;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.fold-toggle:hover {
+  color: var(--ink);
+}
+
+.fold-chevron {
+  display: inline-block;
+  transition: transform 0.15s ease;
+  font-size: 0.75rem;
+}
+
+.fold-toggle.open .fold-chevron {
+  transform: rotate(90deg);
+}
+
+.fold-count {
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--line) 70%, white);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fold-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.fold-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(20, 32, 28, 0.28);
+  backdrop-filter: blur(2px);
+}
+
+.modal-card {
+  width: min(100%, 420px);
+  border-radius: calc(var(--radius) + 2px);
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-2) 96%, white);
+  box-shadow: var(--shadow);
+  padding: 1.1rem 1.15rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
 }
 
 .welcome-card.pinned {

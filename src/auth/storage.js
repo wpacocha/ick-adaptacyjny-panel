@@ -30,6 +30,10 @@ export function toolKeyForUser(baseKey, userId) {
   return `${baseKey}:${userId}`
 }
 
+export function customAppsKeyForUser(userId) {
+  return `ick-user-webapps-${userId}`
+}
+
 export async function hashPassword(password, salt) {
   const data = new TextEncoder().encode(`${salt}:${password}`)
   const buf = await crypto.subtle.digest('SHA-256', data)
